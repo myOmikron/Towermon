@@ -1,5 +1,4 @@
 pygame~=2.1.2
 pydantic~=1.9.1
-setuptools~=62.5.0
-Cython~=0.29.30
 hypothesis~=6.47.3
+pytest~=7.1.2
