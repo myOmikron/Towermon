@@ -26,8 +26,8 @@ class AStar:
         return path
 
     def search(self, start: Cell, end: Cell, mesh) -> Optional[List[Cell]]:
-        """
-        search the shortest path from start to end
+        """search the shortest path from start to end
+
         :param start:
         :param end:
         :param mesh:
@@ -43,8 +43,10 @@ class AStar:
             if current == end:
                 return self.reverse_path(current)
             for neighbor in mesh.get_neighbours(current.position):
-                tentative_g_score = self.g_score[current] + self.cot_to_next_cell(current,
-                                                                                  neighbor) + neighbor.travel_cost
+                tentative_g_score = self.g_score[current] + self.cot_to_next_cell(
+                    current,
+                    neighbor
+                ) + neighbor.travel_cost
                 if tentative_g_score < self.g_score[neighbor]:
                     self.came_from[neighbor] = current
                     self.g_score[neighbor] = tentative_g_score

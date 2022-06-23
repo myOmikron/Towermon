@@ -1,8 +1,6 @@
 import math
-from dataclasses import field
+from dataclasses import field, dataclass
 from typing import List, Tuple, Any, Dict
-
-from dataclasses import dataclass
 
 
 @dataclass
@@ -49,9 +47,9 @@ class NavMesh:
             print("".join([str(x.travel_cost) if x.passable else 'X' for x in row]))
 
     def find_path(self, start: Tuple[int, int], end: Tuple[int, int], solver, recalculate=False) -> List[Cell]:
-        """
-        Finds the sortest path between two points and caches it, if the path already exists it returns the cached
+        """Finds the sortest path between two points and caches it, if the path already exists it returns the cached
         version.
+
         :param recalculate: recalculate an existing path if True
         :param start: start point
         :param end: end point
@@ -63,8 +61,8 @@ class NavMesh:
                 return path
 
         def d(p1: Cell, p2: Cell) -> float:
-            """
-            Heuristic to estimate distance to goal
+            """Heuristic to estimate distance to goal
+
             :param p1: start point
             :param p2: end point
             :return: euclidian distance aka travel cost
