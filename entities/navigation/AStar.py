@@ -4,7 +4,7 @@ from math import inf
 from queue import PriorityQueue
 from typing import Callable, Dict, DefaultDict, Optional, List
 
-from NavMesh import Cell, PrioritizedItem
+from entities.navigation.NavMesh import Cell, PrioritizedItem
 
 
 @dataclass

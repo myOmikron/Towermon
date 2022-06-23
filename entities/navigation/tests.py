@@ -1,4 +1,4 @@
-from NavMesh import NavMesh, Cell
+from entities.navigation.NavMesh import NavMesh, Cell
 from entities.navigation.AStar import AStar
 
 from hypothesis import given, strategies as st
