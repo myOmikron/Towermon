@@ -69,7 +69,7 @@ class Entity:
         if d <= MAGIC_NUMBER:
             self.position = self.goal
             if len(self.path) > 0:
-                print(f"Target updated: {self.path}")
+                # print(f"Target updated: {self.path}")
                 goal = self.path.pop(0)
                 self.set_target(goal)
             else:
