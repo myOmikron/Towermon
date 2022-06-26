@@ -4,19 +4,20 @@ from math import inf
 from queue import PriorityQueue
 from typing import Callable, Dict, DefaultDict, Optional, List
 
-from entities.navigation.NavMesh import Cell, PrioritizedItem
+from entities.navigation.Math.Vector2 import Vector2
+from entities.navigation.NavMesh import PrioritizedItem
 
 
-@dataclass
+@dataclass(slots=False)
 class AStar:
     # estimate the cost to gol
-    cost_to_gol: Callable[[Cell, Cell], float]
+    cost_to_gol: Callable[[Vector2, Vector2], float]
     # calculate the cost to next Cell
-    cot_to_next_cell: Callable[[Cell, Cell], float]
+    cot_to_next_cell: Callable[[Vector2, Vector2], float]
     open_set: PriorityQueue = field(default_factory=lambda: PriorityQueue())
     came_from: Dict = field(default_factory=lambda: dict())
-    g_score: DefaultDict = field(default_factory=lambda: defaultdict(lambda: inf))
-    f_score: DefaultDict = field(default_factory=lambda: defaultdict(lambda: inf))
+    g_score: DefaultDict[Vector2, float] = field(default_factory=lambda: defaultdict(lambda: inf))
+    f_score: DefaultDict[Vector2, float] = field(default_factory=lambda: defaultdict(lambda: inf))
 
     def reverse_path(self, current):
         path = [current]
@@ -25,14 +26,13 @@ class AStar:
             path.insert(0, current)
         return path
 
-    def search(self, start: Cell, end: Cell, mesh) -> Optional[List[Cell]]:
+    def search(self, start: Vector2, end: Vector2, mesh) -> Optional[List[Vector2]]:
         """search the shortest path from start to end
 
         :param start:
         :param end:
         :param mesh:
         :return: if shortest-path exists it returns it else None
-        TODO: no PriorityQueue and no Cell in the Queue for a better performance ?
         """
         self.open_set.put(PrioritizedItem(0.0, start))
         self.g_score[start] = 0
@@ -42,16 +42,16 @@ class AStar:
             current = self.open_set.get().item
             if current == end:
                 return self.reverse_path(current)
-            for neighbor in mesh.get_neighbours(current.position):
+            for neighbor in mesh.get_neighbours(current):
                 tentative_g_score = self.g_score[current] + self.cot_to_next_cell(
                     current,
-                    neighbor
+                    neighbor.position
                 ) + neighbor.travel_cost
-                if tentative_g_score < self.g_score[neighbor]:
-                    self.came_from[neighbor] = current
-                    self.g_score[neighbor] = tentative_g_score
-                    self.f_score[neighbor] = tentative_g_score + self.cost_to_gol(neighbor, end)
+                if tentative_g_score < self.g_score[neighbor.position]:
+                    self.came_from[neighbor.position] = current
+                    self.g_score[neighbor.position] = tentative_g_score
+                    self.f_score[neighbor.position] = tentative_g_score + self.cost_to_gol(neighbor.position, end) + neighbor.travel_cost
                     if not neighbor.visited:
                         neighbor.visited = True
-                        self.open_set.put(PrioritizedItem(self.f_score[neighbor], neighbor))
+                        self.open_set.put(PrioritizedItem(self.f_score[neighbor.position], neighbor.position))
         return None

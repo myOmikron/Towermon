@@ -3,6 +3,7 @@ import sys
 import pygame
 
 import settings
+from entities.Test import Test
 from entities.level import Level
 from entities.player import Player
 from utils import image
@@ -34,13 +35,15 @@ class Game:
 
         self.level = Level(self.scale)
         self.player = Player("player.png", self.scale)
+        self.font = pygame.font.SysFont("Arial", 18, bold=True)
+        if settings.DEBUG:
+            self.test = Test(self.scale)
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
-
         while True:
             # Trigger clock
-            time_delta = self.clock.tick(settings.FPS_LOCK)/1000
+            time_delta = self.clock.tick() / 1000
 
             for event in pygame.event.get():
                 # Handle quit event
@@ -65,6 +68,19 @@ class Game:
                         move_west = event.type == pygame.KEYDOWN
                     if event.key == pygame.K_s:
                         move_south = event.type == pygame.KEYDOWN
+                    if settings.DEBUG:
+                        if event.key == pygame.K_q:
+                            if event.type == pygame.KEYDOWN:
+                                self.test.set_start(*pygame.mouse.get_pos(), scale=self.scale)
+                        if event.key == pygame.K_e:
+                            if event.type == pygame.KEYDOWN:
+                                self.test.set_end(*pygame.mouse.get_pos(), scale=self.scale)
+                        if event.key == pygame.K_r:
+                            if event.type == pygame.KEYDOWN:
+                                self.test.search()
+                        if event.key == pygame.K_t:
+                            if event.type == pygame.KEYDOWN:
+                                self.test.spawn()
 
             # Move player
             if move_east:
@@ -80,11 +96,21 @@ class Game:
             elif move_south:
                 self.player.move_south(time_delta)
 
+            if settings.DEBUG:
+                self.test.update(time_delta)
+
             # Render map
             self.level.render(time_delta, self.scale)
 
+            if settings.DEBUG:
+                self.test.render(self.scale)
+
             # Render player
             self.player.render(time_delta, self.scale)
+
+            fps = str(int(self.clock.get_fps()))
+            fps_t = self.font.render(fps, True, pygame.Color("RED"))
+            pygame.display.get_surface().blit(fps_t, (0, 0))
 
             pygame.display.update()
 
