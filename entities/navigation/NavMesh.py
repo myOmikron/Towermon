@@ -1,6 +1,7 @@
 from dataclasses import field, dataclass
 from typing import List, Tuple, Any, Dict
 
+import settings
 from .Math.Vector2 import Vector2
 
 
@@ -15,7 +16,7 @@ class Cell:
         return hash(self.position)
 
 
-@dataclass(order=True,slots=True)
+@dataclass(order=True, slots=True)
 class PrioritizedItem:
     priority: float
     item: Any = field(compare=False)
@@ -35,7 +36,7 @@ class NavMesh:
 
     def get_neighbours(self, position: Vector2):
         x, y = position.x, position.y
-        for x_off, y_off in [(0, 1), (1, 0), (-1, 0), (0, -1), (-1, 1), (1, -1), (1, 1), (-1, -1)]:  # [(-1, 1), (1, -1), (1, 1), (-1, -1)]
+        for x_off, y_off in settings.NEIGHBOURS:
             nx = x + x_off
             ny = y + y_off
             if 0 <= nx < self.width and 0 <= ny < self.height:

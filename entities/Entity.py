@@ -1,9 +1,14 @@
+import time
 from abc import ABC
+from copy import deepcopy
 from dataclasses import dataclass
 import math
-from typing import List
+from typing import List, Union, Any
 
 import pygame
+from pygame.sprite import AbstractGroup
+from pygame.surface import Surface, SurfaceType
+
 from entities.navigation.Math.Vector2 import Vector2
 
 import settings
@@ -26,12 +31,12 @@ class Entity:
     Base Class for Entities, can follow a path
     """
 
-    def angle_from_direction(self) -> float:
+    def angle_from_direction(self) -> int:
         """
         calculate the current angle in degrees from the direction vector
         :return: angle
         """
-        return self.position.angle_from_direction()
+        return self.direction.angle_from_direction()
 
     def set_target(self, goal: Vector2) -> None:
         """
@@ -81,14 +86,67 @@ class Sprite(pygame.sprite.Sprite):
     Generic Sprit Class for Pygame Surface
     """
 
-    def __init__(self, image_path: str, initial_scale: float, position: Vector2, angle: float = 0):
+    def __init__(self, image_path: str, position: Vector2, angle: float = 0, scale: float = 1):
         super(Sprite, self).__init__()
         self.image = utils.image.load_png(image_path)
+        self.current_image = self.image
         self.rect = self.image.get_rect()
         self.screen = pygame.display.get_surface()
         self.position = position
-        self.scale = initial_scale
         self.angle = angle
+        self.scale = scale
+
+    def render(self, scale: float, angle: int) -> None:
+        """
+        Render the sprit
+        :param angle: float of the current angle in degree
+        :param scale: float, current map scale
+        :return: None
+        """
+
+        scaled_tile_size = round(settings.TILE_SIZE * scale)
+        x = round(self.position.x * scaled_tile_size)
+        y = round(self.position.y * scaled_tile_size)
+
+        # only update the scale or the rotation if it really changed
+
+        if self.angle != angle:
+            print(f"c angle: {self.angle} n angle: {angle}")
+            img = utils.transform.rot_center(self.image, angle)
+            self.current_image = pygame.transform.scale(img, (scaled_tile_size, scaled_tile_size))
+            self.angle = angle
+        if self.scale != scale:
+            print(f"c scale: {self.angle} n scale: {angle}")
+            img = utils.transform.rot_center(self.image, angle)
+            self.current_image = pygame.transform.scale(img, (scaled_tile_size, scaled_tile_size))
+            self.scale = scale
+        self.screen.blit(self.current_image, (x, y))
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    images: List[Surface]
+    current_images: List[Surface]
+    screen: Union[Surface, SurfaceType]
+    index: int = 0
+    last_delta_time: float = 0
+    animation_speed: float = 0.1
+
+    def __init__(self, images: List[Surface], position: Vector2, *groups: AbstractGroup, scale: float = 1):
+        super().__init__(*groups)
+        self.images = images
+        self.position = position
+        self.scale = scale
+        self.screen = pygame.display.get_surface()
+        self.current_images = self.images
+
+    def update(self, delta_time: float, *args: Any, **kwargs: Any) -> None:
+        if self.last_delta_time + delta_time >= self.animation_speed:
+            if self.index < len(self.images)-1:
+                self.index += 1
+            else:
+                self.index = 0
+            self.last_delta_time = 0
+        self.last_delta_time += delta_time
 
     def render(self, scale: float) -> None:
         """
@@ -96,28 +154,33 @@ class Sprite(pygame.sprite.Sprite):
         :param scale: float, current map scale
         :return: None
         """
-        if self.scale != scale:
-            self.scale = scale
 
         scaled_tile_size = round(settings.TILE_SIZE * scale)
         x = round(self.position.x * scaled_tile_size)
         y = round(self.position.y * scaled_tile_size)
 
-        scaled_tile_size = round(settings.TILE_SIZE * scale)
-        img = utils.transform.rot_center(self.image, self.angle)
-        img = pygame.transform.scale(img, (scaled_tile_size, scaled_tile_size))
-        self.screen.blit(img, (x, y))
+        # only update the scale or the rotation if it really changed
+
+        if self.scale != scale:
+            self.current_images = [pygame.transform.scale(img, (self.images[0].get_width()*scale, self.images[0].get_height()*scale)) for img in self.images]
+            self.scale = scale
+        self.screen.blit(self.current_images[self.index], (x, y))
 
 
-class Enemy(Entity, Sprite):
+class Enemy(Entity, AnimatedSprite):
     """
     Base Class for Enemies
     consists of Entity and Sprite to combine movement with grafik
     """
 
-    def __init__(self, position, path, image_path, scale):
+    def __init__(self, position, path, images):
         Entity.__init__(self, path, position)
-        Sprite.__init__(self, image_path, scale, position)
+        AnimatedSprite.__init__(self, images, position)
+        self.animation_speed = 1/(self.speed*3)
+
+    def update(self, delta_time: float) -> None:
+        Entity.update(self, delta_time)
+        AnimatedSprite.update(self, delta_time)
 
     def render(self, scale: float) -> None:
         """
@@ -125,7 +188,7 @@ class Enemy(Entity, Sprite):
         :param scale: float
         :return: None
         """
-        self.angle = self.angle_from_direction()
+        # angle = self.angle_from_direction()
         super().render(scale)
 
 
@@ -138,15 +201,15 @@ class EntityFactory(ABC):
 
 class EnemyFactory(EntityFactory):
     scale: float
-    image_path: str
+    images: List[Surface]
     """
     EnemyFactory, to create a new enemy type with the same image and only have a different position and path on 
     instantiation
     """
 
-    def __init__(self, image_path, scale):
-        self.image_path = image_path
+    def __init__(self, images, scale):
+        self.images = images
         self.scale = scale
 
-    def get_entity(self, position, path) -> Entity:
-        return Enemy(image_path=self.image_path, scale=self.scale, path=path, position=position)
+    def get_entity(self, position: Vector2, path: List[Vector2]) -> Entity:
+        return Enemy(images=self.images, path=path, position=position)

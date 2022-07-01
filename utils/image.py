@@ -1,4 +1,5 @@
 import os
+from typing import Tuple, List
 
 import pygame
 
@@ -20,3 +21,34 @@ def load_png(name) -> pygame.Surface:
         print('Cannot load image:', fullname)
         raise SystemExit(message)
     return image
+
+
+def load_tile_map(name: str, tile_dim: Tuple[int, int]) -> List[pygame.Surface]:
+    """
+    Load a tilemap into single tiles
+    :param name: name of the tilemap file
+    :param tile_dim: dimension of on tile in the map
+    :return: a List of the tiles
+    """
+    tile_map = load_png(name)
+    tile_map_rect = tile_map.get_rect()
+    w = tile_map_rect.width // tile_dim[0]
+    h = tile_map_rect.height // tile_dim[1]
+    x, y = 0, 0
+    tiles = []
+    for _ in range(h):
+        for _ in range(w):
+            tiles.append(tile_map.subsurface((x, y, tile_dim[0], tile_dim[1])))
+            x += tile_dim[0]
+        x = 0
+        y += tile_dim[1]
+    return tiles
+
+
+if __name__ == "__main__":
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
+    # Game init
+    pygame.init()
+    # Set fullscreen && double buffering for performance improvement
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
+    load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))

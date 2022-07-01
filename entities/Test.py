@@ -8,6 +8,7 @@ from entities.Entity import EnemyFactory
 from entities.EntitySpawner import EntitySpawner
 from entities.navigation.AStar import AStar
 from entities.navigation.NavMesh import Cell, NavMesh
+from utils.image import load_tile_map
 
 
 class Test:
@@ -22,7 +23,8 @@ class Test:
                                 [[Cell(Vector2((x, y))) for x in range(settings.LEVEL_WIDTH)] for y in
                                  range(settings.LEVEL_HEIGHT)])
         self.current_path = None
-        enemy_factory = EnemyFactory('player.png', scale)
+        tiles = load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
+        enemy_factory = EnemyFactory(tiles[:4], scale)
         self.spawner = EntitySpawner(dead=[], on_the_way=[], spawned=[], path=self.current_path,
                                      position=Vector2(self.start),
                                      factory=enemy_factory)

@@ -68,7 +68,7 @@ class Vector2:
         returns a new uniformed Vector2
         :return: Vector2
         """
-        return JitCmp.uniform(self._data)
+        return Vector2(JitCmp.uniform(self._data))
 
     def direction(self, other):
         """
@@ -81,14 +81,12 @@ class Vector2:
             return Vector2(JitCmp.direction(self._data, other._data))
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
-    def angle_from_direction(self) -> float:
+    def angle_from_direction(self) -> int:
         """
         calculate the current angle in degrees from the direction vector
-        :return: the angle in degrees, if y is 0 it always returns 0
+        :return: the angle in degrees
         """
-        if self.y > 0:
-            return JitCmp.angle(self._data)
-        return 0
+        return JitCmp.angle(self._data)
 
     def update(self, direction, speed: float, delta_time: float) -> None:
         """

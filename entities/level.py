@@ -80,4 +80,4 @@ class Level:
         # TODO: Only rerender necessary parts
         self._render()
 
-        self.visible_sprites.draw(self.screen)
+        # self.visible_sprites.draw(self.screen)
