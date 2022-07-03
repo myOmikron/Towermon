@@ -50,6 +50,20 @@ class Game:
         # set main_menu as current menu
         self.curr_menu = self.main_menu
 
+        self.font_name = "assets/Gameplay.ttf"
+
+        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
+
+        # Initialize menu objects
+        self.main_menu = MainMenu(self)
+        self.options = OptionsMenu(self)
+        self.credits = CreditsMenu(self)
+        self.volume = VolumeMenu(self)
+        self.controls = ControlsMenu(self)
+
+        # set main_menu as current menu
+        self.curr_menu = self.main_menu
+
         # Fill screen black
         self.screen.fill((0, 0, 0))
 
@@ -60,6 +74,39 @@ class Game:
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
         if settings.DEBUG:
             self.test = Test(self.scale)
+
+    def draw_text(self, text, size, pos_x, pos_y):
+        font = pygame.font.Font(self.font_name, size)
+        text_surface = font.render(text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.center = (pos_x, pos_y)
+        self.screen.blit(text_surface, text_rect)
+
+    # check events help function for menu
+    def check_events(self):
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                self.running, self.playing = False, False
+                self.curr_menu.run_display = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.START_KEY = True
+                if event.key == pygame.K_BACKSPACE:
+                    self.BACK_KEY = True
+                if event.key == pygame.K_DOWN:
+                    self.DOWN_KEY = True
+                    self.click_sound.play()
+                if event.key == pygame.K_UP:
+                    self.UP_KEY = True
+                    self.click_sound.play()
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
+    # help function for menu inputs
+    def reset_keys(self):
+        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
 
     def draw_text(self, text, size, pos_x, pos_y):
         font = pygame.font.Font(self.font_name, size)

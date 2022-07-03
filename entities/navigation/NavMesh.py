@@ -16,7 +16,7 @@ class Cell:
         return hash(self.position)
 
 
-@dataclass(order=True, slots=True)
+@dataclass(order=True,slots=True)
 class PrioritizedItem:
     priority: float
     item: Any = field(compare=False)

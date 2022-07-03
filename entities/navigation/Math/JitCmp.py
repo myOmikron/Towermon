@@ -1,7 +1,5 @@
-import math
-
 import numpy as np
-from numba import jit, float32, boolean, int32
+from numba import jit, float32, boolean
 
 
 @jit(float32(float32[:], float32[:]), nopython=True, cache=True)
@@ -49,9 +47,9 @@ def uniform(a):
     return a / length(a)
 
 
-@jit(int32(float32[:]), nopython=True, cache=True)
+@jit(float32(float32[:]), nopython=True, cache=True)
 def angle(a):
-    return math.floor(math.atan2(a[0], a[1]) * (180 / math.pi))
+    return np.degrees(np.arctan(a[0] / a[1]))
 
 
 @jit(float32[:](float32[:], float32[:], float32, float32), nopython=True, cache=True)

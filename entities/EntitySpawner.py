@@ -38,7 +38,7 @@ class EntitySpawner:
         :param scale: float
         :return: None
         """
-        for entity in reversed(self.on_the_way):
+        for entity in self.on_the_way:
             entity.render(scale)
 
     def update_spawn(self, delta_time: float, frequenz: float):
@@ -53,7 +53,6 @@ class EntitySpawner:
                 entity = self.spawned.pop()
                 entity.path.pop(0)
                 entity.set_target(entity.path.pop(0))
-                entity.angle = entity.angle_from_direction()
                 self.on_the_way.append(entity)
                 return
             self.last_delta += delta_time
