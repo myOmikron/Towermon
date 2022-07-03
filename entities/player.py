@@ -71,8 +71,7 @@ class Player(pygame.sprite.Sprite):
 
         self.screen.blit(
             pygame.transform.scale(
-                # utils.transform.rot_center(self.image, angle),
-                self.image,
+                utils.transform.rot_center(self.image, angle),
                 (scaled_tile_size, scaled_tile_size)
             ),
             (
