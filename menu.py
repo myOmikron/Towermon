@@ -16,7 +16,7 @@ class Menu():
         self.offset = - 100
 
     def draw_cursor(self):
-        self.game.draw_text('*', 20, self.cursor_rect.x, self.cursor_rect.y)
+        self.game.draw_text('#', 20, self.cursor_rect.x, self.cursor_rect.y)
 
     def blit_(self):
         self.game.screen.blit(self.game.screen, (0, 0))

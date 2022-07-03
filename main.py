@@ -38,6 +38,8 @@ class Game:
 
         self.font_name = "assets/Gameplay.ttf"
 
+        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
+
         # Initialize menu objects
         self.main_menu = MainMenu(self)
         self.options = OptionsMenu(self)
@@ -80,8 +82,10 @@ class Game:
                     self.BACK_KEY = True
                 if event.key == pygame.K_DOWN:
                     self.DOWN_KEY = True
+                    self.click_sound.play()
                 if event.key == pygame.K_UP:
                     self.UP_KEY = True
+                    self.click_sound.play()
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
