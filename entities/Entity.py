@@ -5,9 +5,12 @@ from dataclasses import dataclass
 import math
 from typing import List, Union, Any
 
+import numpy as np
 import pygame
 from pygame.sprite import AbstractGroup
 from pygame.surface import Surface, SurfaceType
+
+from numpy.typing import NDArray
 
 from entities.navigation.Math.Vector2 import Vector2
 
@@ -124,29 +127,41 @@ class Sprite(pygame.sprite.Sprite):
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    images: List[Surface]
-    current_images: List[Surface]
+    images: NDArray[NDArray[Surface]]
+    current_images: NDArray[NDArray[Surface]]
     screen: Union[Surface, SurfaceType]
-    index: int = 0
-    last_delta_time: float = 0
-    animation_speed: float = 0.1
+    animation_speed: float
+    index_x: int
+    index_y: int
+    last_delta_time: float
 
-    def __init__(self, images: List[Surface], position: Vector2, *groups: AbstractGroup, scale: float = 1):
+    def __init__(self, images: NDArray[NDArray[Surface]], position: Vector2, *groups: AbstractGroup, scale: float = 1):
         super().__init__(*groups)
         self.images = images
         self.position = position
         self.scale = scale
         self.screen = pygame.display.get_surface()
-        self.current_images = self.images
+        self.current_images = self.images.copy()
+        self.index_x = 0
+        self.index_y = 0
+        self.last_delta_time = 0
 
     def update(self, delta_time: float, *args: Any, **kwargs: Any) -> None:
         if self.last_delta_time + delta_time >= self.animation_speed:
-            if self.index < len(self.images)-1:
-                self.index += 1
+            if self.index_x < self.images.shape[0] - 1:
+                self.index_x += 1
             else:
-                self.index = 0
+                self.index_x = 0
             self.last_delta_time = 0
         self.last_delta_time += delta_time
+
+    @staticmethod
+    def _scale(img, width, height):
+        return pygame.transform.scale(img, (width, height))
+
+    @staticmethod
+    def vectorize(x, w, h):
+        return np.vectorize(AnimatedSprite._scale)(x, w, h)
 
     def render(self, scale: float) -> None:
         """
@@ -160,11 +175,11 @@ class AnimatedSprite(pygame.sprite.Sprite):
         y = round(self.position.y * scaled_tile_size)
 
         # only update the scale or the rotation if it really changed
-
         if self.scale != scale:
-            self.current_images = [pygame.transform.scale(img, (self.images[0].get_width()*scale, self.images[0].get_height()*scale)) for img in self.images]
+            w, h = round(self.images[0][0].get_width() * scale), round(self.images[0][0].get_height() * scale)
+            self.current_images = AnimatedSprite.vectorize(self.images, w, h)
             self.scale = scale
-        self.screen.blit(self.current_images[self.index], (x, y))
+        self.screen.blit(self.current_images[self.index_y][self.index_x], (x, y))
 
 
 class Enemy(Entity, AnimatedSprite):
@@ -176,7 +191,8 @@ class Enemy(Entity, AnimatedSprite):
     def __init__(self, position, path, images):
         Entity.__init__(self, path, position)
         AnimatedSprite.__init__(self, images, position)
-        self.animation_speed = 1/(self.speed*3)
+        self.animation_speed = 1 / (self.speed * 3)
+        self.angle = 0
 
     def update(self, delta_time: float) -> None:
         Entity.update(self, delta_time)
@@ -188,7 +204,16 @@ class Enemy(Entity, AnimatedSprite):
         :param scale: float
         :return: None
         """
-        # angle = self.angle_from_direction()
+        # TODO only change index_y if the direction has changed
+        if self.direction.x == 0.0 and self.direction.y < 0:
+            self.index_y = 3
+        elif self.direction.x == 0.0 and self.direction.y > 0:
+            self.index_y = 0
+        elif self.direction.x < 0 and self.direction.y == 0.0:
+            self.index_y = 1
+        elif self.direction.x > 0 and self.direction.y == 0.0:
+            self.index_y = 2
+
         super().render(scale)
 
 

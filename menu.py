@@ -1,6 +1,9 @@
 import sys
 import pygame
 
+# from fire import DoomFire
+
+
 class Menu():
 
     def __init__(self, game):
@@ -9,7 +12,7 @@ class Menu():
 
         """ Get mid width and mid height position of the current game-window """
         self.x, self.y = pygame.display.get_window_size()
-        self.mid_w, self.mid_h = self.x/2, self.y/2
+        self.mid_w, self.mid_h = self.x / 2, self.y / 2
         """ create cursor rectangle """
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
         """ offset for the cursor, that it is next to Menu Options"""
@@ -23,6 +26,7 @@ class Menu():
         pygame.display.update()
         self.game.reset_keys()
 
+
 class MainMenu(Menu):
 
     def __init__(self, game):
@@ -33,13 +37,16 @@ class MainMenu(Menu):
         self.optionsx, self.optionsy = self.mid_w, self.mid_h + 70
         self.creditsx, self.creditsy = self.mid_w, self.mid_h + 100
         self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
+        # self.fire = DoomFire(game.screen)
 
     def display_menu(self):
         self.show_display = True
         while self.show_display:
+            # self.fire.update()
             self.game.check_events()
             self.check_input()
             self.game.screen.fill((0, 0, 0))
+            # self.fire.draw()
             self.game.draw_text('Main Menu', 30, self.mid_w, self.mid_h - 40)
             self.game.draw_text('Start Game', 20, self.startx, self.starty)
             self.game.draw_text('Exit Game', 20, self.exitx, self.exity)
@@ -47,7 +54,6 @@ class MainMenu(Menu):
             self.game.draw_text('Credits', 20, self.creditsx, self.creditsy)
             self.draw_cursor()
             self.blit_()
-
 
     def move_cursor(self):
         if self.game.DOWN_KEY:
@@ -78,7 +84,6 @@ class MainMenu(Menu):
                 self.cursor_rect.midtop = (self.optionsx + self.offset, self.optionsy)
                 self.state = 'Options'
 
-
     def check_input(self):
         self.move_cursor()
         if self.game.START_KEY:
@@ -92,6 +97,7 @@ class MainMenu(Menu):
             elif self.state == 'Credits':
                 self.game.curr_menu = self.game.credits
             self.show_display = False
+
 
 class OptionsMenu(Menu):
 
@@ -114,10 +120,6 @@ class OptionsMenu(Menu):
             self.draw_cursor()
             self.blit_()
 
-
-
-
-
     def check_input(self):
         if self.game.BACK_KEY:
             self.game.curr_menu = self.game.main_menu
@@ -137,10 +139,12 @@ class OptionsMenu(Menu):
                 self.game.curr_menu = self.game.controls
                 self.show_display = False
 
+
 class VolumeMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
+
     # Todo
 
     def display_menu(self):
@@ -150,7 +154,7 @@ class VolumeMenu(Menu):
             self.check_input()
             self.game.screen.fill((0, 0, 0))
             self.game.draw_text('Volume', 30, self.mid_w, self.mid_h - 40)
-            #self.draw_cursor()
+            # self.draw_cursor()
             self.blit_()
 
     def check_input(self):
@@ -158,11 +162,12 @@ class VolumeMenu(Menu):
             self.game.curr_menu = self.game.options
             self.show_display = False
 
+
 class ControlsMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
-        #Todo
+        # Todo
 
     def display_menu(self):
         self.show_display = True
@@ -171,7 +176,7 @@ class ControlsMenu(Menu):
             self.check_input()
             self.game.screen.fill((0, 0, 0))
             self.game.draw_text('Controls', 30, self.mid_w, self.mid_h - 40)
-            #self.draw_cursor()
+            # self.draw_cursor()
             self.blit_()
 
     def check_input(self):
@@ -191,8 +196,8 @@ class CreditsMenu(Menu):
             if self.game.START_KEY or self.game.BACK_KEY:
                 self.game.curr_menu = self.game.main_menu
                 self.show_display = False
-            self.game.screen.fill((0,0,0))
-            self.game.draw_text('Credits', 50, self.mid_w , self.mid_h - 40)
+            self.game.screen.fill((0, 0, 0))
+            self.game.draw_text('Credits', 50, self.mid_w, self.mid_h - 40)
             self.game.draw_text('Made by', 25, self.mid_w, self.mid_h + 10)
             self.game.draw_text('Lukas Mahr', 15, self.mid_w, self.mid_h + 50)
             self.game.draw_text('Niklas Pfister', 15, self.mid_w, self.mid_h + 70)
