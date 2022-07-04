@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from typing import List
 from copy import deepcopy
 
-from entities.Entity import Entity, EntityFactory
-from entities.navigation.Math.Vector2 import Vector2
+from entities.entity import Entity, Enemy
+from entities.entity_factories import EntityFactory, EnemyFactory
+from entities.navigation.Math.vector2 import Vector2
 
 
 @dataclass(slots=True)
@@ -14,7 +15,7 @@ class EntitySpawner:
     dead: List[Entity]
     spawned: List[Entity]
     factory: EntityFactory
-    last_delta: float = 0
+    last_delta: float
     """
     Entity Spawner, can spawn entities and control their pathing
     """
@@ -32,15 +33,6 @@ class EntitySpawner:
                 self.dead.append(entity)
                 self.on_the_way.remove(entity)
 
-    def render(self, scale: float) -> None:
-        """
-        Render all the entities from the spawner
-        :param scale: float
-        :return: None
-        """
-        for entity in self.on_the_way:
-            entity.render(scale)
-
     def update_spawn(self, delta_time: float, frequenz: float):
         """
         Update the spawn, the spawner will send off an entity from the spawned list at frequent intervals
@@ -54,6 +46,7 @@ class EntitySpawner:
                 entity.path.pop(0)
                 entity.set_target(entity.path.pop(0))
                 self.on_the_way.append(entity)
+                self.last_delta = 0
                 return
             self.last_delta += delta_time
 
@@ -66,3 +59,24 @@ class EntitySpawner:
         for _ in range(amount):
             entity = self.factory.get_entity(self.position.copy(), deepcopy(self.path))
             self.spawned.append(entity)
+
+
+@dataclass(slots=True)
+class EnemySpawner(EntitySpawner):
+    on_the_way: List[Enemy]
+    dead: List[Enemy]
+    spawned: List[Enemy]
+    factory: EnemyFactory
+
+    """
+        Enemy Spawner, can spawn enemies, control their pathing and render them.
+    """
+
+    def render(self, scale: float) -> None:
+        """
+        Render all the entities from the spawner
+        :param scale: float
+        :return: None
+        """
+        for entity in self.on_the_way:
+            entity.render(scale)

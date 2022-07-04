@@ -2,7 +2,7 @@ from dataclasses import field, dataclass
 from typing import List, Tuple, Any, Dict
 
 import settings
-from .Math.Vector2 import Vector2
+from .Math.vector2 import Vector2
 
 
 @dataclass(slots=True)
@@ -16,7 +16,7 @@ class Cell:
         return hash(self.position)
 
 
-@dataclass(order=True,slots=True)
+@dataclass(order=True, slots=True)
 class PrioritizedItem:
     priority: float
     item: Any = field(compare=False)

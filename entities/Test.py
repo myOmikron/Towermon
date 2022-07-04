@@ -3,13 +3,13 @@ from typing import Tuple
 import pygame
 
 import utils.image
-from entities.navigation.Math.Vector2 import Vector2
+from entities.navigation.Math.vector2 import Vector2
 
 import settings
-from entities.Entity import EnemyFactory
-from entities.EntitySpawner import EntitySpawner
-from entities.navigation.AStar import AStar
-from entities.navigation.NavMesh import Cell, NavMesh
+from entities.entity_factories import EnemyFactory
+from entities.spawners import EnemySpawner
+from entities.navigation.a_star import AStar
+from entities.navigation.nav_mesh import Cell, NavMesh
 
 
 class Test:
@@ -18,17 +18,17 @@ class Test:
     """
 
     def __init__(self, scale):
-        self.start = (0, 0)
-        self.end = (499, 499)
+        self.start = (5, 5)
+        self.end = (50, 30)
         self.nav_mesh = NavMesh(settings.LEVEL_WIDTH, settings.LEVEL_HEIGHT,
                                 [[Cell(Vector2((x, y))) for x in range(settings.LEVEL_WIDTH)] for y in
                                  range(settings.LEVEL_HEIGHT)])
         self.current_path = None
         images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
         enemy_factory = EnemyFactory(images, scale)
-        self.spawner = EntitySpawner(dead=[], on_the_way=[], spawned=[], path=self.current_path,
-                                     position=Vector2(self.start),
-                                     factory=enemy_factory)
+        self.spawner = EnemySpawner(dead=[], on_the_way=[], spawned=[], path=self.current_path,
+                                    position=Vector2(self.start),
+                                    factory=enemy_factory, last_delta=0)
 
     def set_start(self, x: int, y: int, scale: float):
         """
@@ -54,7 +54,7 @@ class Test:
         print(f"Set new End position: {self.end}")
 
     def spawn(self):
-        self.spawner.spawn(1)
+        self.spawner.spawn(1000)
         print("spawned Enemy")
 
     @staticmethod
@@ -119,7 +119,7 @@ class Test:
         :return: None
         """
         self.spawner.update(delta_time)
-        self.spawner.update_spawn(delta_time, 1.0)
+        self.spawner.update_spawn(delta_time, 0.2)
 
     def render(self, scale: float) -> None:
         """

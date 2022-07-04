@@ -4,8 +4,8 @@ from math import inf
 from queue import PriorityQueue
 from typing import Callable, Dict, DefaultDict, Optional, List
 
-from entities.navigation.Math.Vector2 import Vector2
-from entities.navigation.NavMesh import PrioritizedItem
+from entities.navigation.Math.vector2 import Vector2
+from entities.navigation.nav_mesh import PrioritizedItem
 
 
 @dataclass(slots=False)

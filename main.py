@@ -1,145 +1,41 @@
-import sys
-
-import pygame
+from pygame.font import Font
+from pygame.mixer import Sound
+from pygame.surface import SurfaceType
 
 import settings
 from entities.Test import Test
 from entities.level import Level
 from entities.player import Player
+from menu import *
 from utils import image
-from menu import*
 
 
 class Game:
-    def __init__(self):
-        # Initialize the audio mixer
-        pygame.mixer.pre_init(44100, 16, 2, 4096)
+    level: Level
+    scale: int
+    player: Player
+    font: Font
+    playing: bool
+    screen: SurfaceType
+    test: Test
 
-        # Game init
-        pygame.init()
-
-        # Set fullscreen && double buffering for performance improvement
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
-        x = self.screen.get_width()
-
-        # Set allowed events for performance improvement
-        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
-
-        pygame.display.set_caption("Tower defense")
-        pygame.display.set_icon(image.load_png("favicon.png"))
-
-        # Set running and playing variables
-        self.running, self.playing, = True, False
-
+    def __init__(self, screen: SurfaceType):
         # Set Keys on default for menu actions
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
-
         self.clock = pygame.time.Clock()
-
-        self.font_name = "assets/Gameplay.ttf"
-
-        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
-
-        # Initialize menu objects
-        self.main_menu = MainMenu(self)
-        self.options = OptionsMenu(self)
-        self.credits = CreditsMenu(self)
-        self.volume = VolumeMenu(self)
-        self.controls = ControlsMenu(self)
-
-        # set main_menu as current menu
-        self.curr_menu = self.main_menu
-
-        self.font_name = "assets/Gameplay.ttf"
-
-        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
-
-        # Initialize menu objects
-        self.main_menu = MainMenu(self)
-        self.options = OptionsMenu(self)
-        self.credits = CreditsMenu(self)
-        self.volume = VolumeMenu(self)
-        self.controls = ControlsMenu(self)
-
-        # set main_menu as current menu
-        self.curr_menu = self.main_menu
+        self.screen = screen
+        # Set running and playing variables
+        self.playing = False
 
         # Fill screen black
         self.screen.fill((0, 0, 0))
 
         self.scale = 1
-
         self.level = Level(self.scale)
         self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
         if settings.DEBUG:
             self.test = Test(self.scale)
-
-    def draw_text(self, text, size, pos_x, pos_y):
-        font = pygame.font.Font(self.font_name, size)
-        text_surface = font.render(text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect()
-        text_rect.center = (pos_x, pos_y)
-        self.screen.blit(text_surface, text_rect)
-
-    # check events help function for menu
-    def check_events(self):
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                self.running, self.playing = False, False
-                self.curr_menu.run_display = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    self.START_KEY = True
-                if event.key == pygame.K_BACKSPACE:
-                    self.BACK_KEY = True
-                if event.key == pygame.K_DOWN:
-                    self.DOWN_KEY = True
-                    self.click_sound.play()
-                if event.key == pygame.K_UP:
-                    self.UP_KEY = True
-                    self.click_sound.play()
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-
-    # help function for menu inputs
-    def reset_keys(self):
-        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
-
-    def draw_text(self, text, size, pos_x, pos_y):
-        font = pygame.font.Font(self.font_name, size)
-        text_surface = font.render(text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect()
-        text_rect.center = (pos_x, pos_y)
-        self.screen.blit(text_surface, text_rect)
-
-    # check events help function for menu
-    def check_events(self):
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                self.running, self.playing = False, False
-                self.curr_menu.run_display = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    self.START_KEY = True
-                if event.key == pygame.K_BACKSPACE:
-                    self.BACK_KEY = True
-                if event.key == pygame.K_DOWN:
-                    self.DOWN_KEY = True
-                    self.click_sound.play()
-                if event.key == pygame.K_UP:
-                    self.UP_KEY = True
-                    self.click_sound.play()
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-
-    # help function for menu inputs
-    def reset_keys(self):
-        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
@@ -215,13 +111,88 @@ class Game:
 
             pygame.display.update()
 
-    def game_loop(self):
-        while game.running:
-            game.curr_menu.display_menu()
+
+class App:
+    screen: SurfaceType
+    menu: Menu
+    main_menu: Menu
+    options_menu: Menu
+    credits: Menu
+    volume: Menu
+    controls: Menu
+    game: Game
+    font_name: str
+    click_sound: Sound
+    running: bool = True
+    playing: bool = False
+    UP_KEY: bool = False
+    DOWN_KEY: bool = False
+    START_KEY: bool = False
+    BACK_KEY: bool = False
+
+    def __init__(self):
+        # Initialize the audio mixer
+        pygame.mixer.pre_init(44100, 16, 2, 4096)
+
+        # Game init
+        pygame.init()
+
+        # Set fullscreen && double buffering for performance improvement
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
+
+        # Set allowed events for performance improvement
+        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+
+        pygame.display.set_caption("Tower defense")
+        pygame.display.set_icon(image.load_png("favicon.png"))
+
+        # Initialize menu objects
+        self.main_menu = MainMenu(self)
+        self.options = OptionsMenu(self)
+        self.credits = CreditsMenu(self)
+        self.volume = VolumeMenu(self)
+        self.controls = ControlsMenu(self)
+
+        # set main_menu as current menu
+        self.menu = self.main_menu
+        self.font_name = "assets/Gameplay.ttf"
+        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
+        self.game = Game(self.screen)
+
+    def check_events(self):
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                self.running, self.playing = False, False
+                self.menu.run_display = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.START_KEY = True
+                if event.key == pygame.K_BACKSPACE:
+                    self.BACK_KEY = True
+                if event.key == pygame.K_DOWN:
+                    self.DOWN_KEY = True
+                    self.click_sound.play()
+                if event.key == pygame.K_UP:
+                    self.UP_KEY = True
+                    self.click_sound.play()
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
+    # help function for menu inputs
+    def reset_keys(self):
+        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
+
+    def run(self):
+        while self.running:
+            self.menu.display_menu()
             if self.playing:
-                game.run()
+                self.game.playing = self.playing
+                self.game.run()
+                self.playing = self.game.playing
 
 
 if __name__ == '__main__':
-    game = Game()
-    game.game_loop()
+    app = App()
+    app.run()

@@ -3,7 +3,7 @@ from typing import Union, Tuple
 
 import numpy as np
 
-from . import JitCmp
+from . import jit_cmp
 
 number = Union[int, float]
 
@@ -35,23 +35,20 @@ class Vector2:
         :return: float
         """
         if isinstance(other, Vector2):
-            # print(f"Distance Type: {self._data, other._data}")
-            return JitCmp.distance(self._data, other._data)
+            return jit_cmp.distance(self._data, other._data)
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
     def _length(self) -> float:
-        return JitCmp.length(self._data)
+        return jit_cmp.length(self._data)
 
     def _add(self, other):
         if isinstance(other, Vector2):
-            # print(f"Add Type: {self._data, other._data}")
-            return Vector2(JitCmp.add(self._data, other._data))
+            return Vector2(jit_cmp.add(self._data, other._data))
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
     def _sub(self, other):
         if isinstance(other, Vector2):
-            # print(f"Sub Type: {self._data, other._data}")
-            return Vector2(JitCmp.sub(self._data, other._data))
+            return Vector2(jit_cmp.sub(self._data, other._data))
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
     def _hash(self):
@@ -59,8 +56,7 @@ class Vector2:
 
     def _equals(self, other):
         if isinstance(other, Vector2):
-            # print(f"Equals Type: {self._data, other._data}")
-            return JitCmp.equals(self._data, other._data)
+            return jit_cmp.equals(self._data, other._data)
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
     def uniform(self):
@@ -68,7 +64,7 @@ class Vector2:
         returns a new uniformed Vector2
         :return: Vector2
         """
-        return JitCmp.uniform(self._data)
+        return jit_cmp.uniform(self._data)
 
     def direction(self, other):
         """
@@ -76,9 +72,8 @@ class Vector2:
         :param other: Vector2
         :return: Vector2
         """
-        # print(f"Direction Type: {self._data, other._data}")
         if isinstance(other, Vector2):
-            return Vector2(JitCmp.direction(self._data, other._data))
+            return Vector2(jit_cmp.direction(self._data, other._data))
         raise TypeError(f"other is not from type Vector2: {type(other)}")
 
     def angle_from_direction(self) -> float:
@@ -87,7 +82,7 @@ class Vector2:
         :return: the angle in degrees, if y is 0 it always returns 0
         """
         if self.y > 0:
-            return JitCmp.angle(self._data)
+            return jit_cmp.angle(self._data)
         return 0
 
     def update(self, direction, speed: float, delta_time: float) -> None:
@@ -98,7 +93,7 @@ class Vector2:
         :param delta_time: float
         :return: None
         """
-        self._data = JitCmp.update(self._data, direction._data, speed, delta_time)
+        self._data = jit_cmp.update(self._data, direction._data, speed, delta_time)
 
     def copy(self):
         """
