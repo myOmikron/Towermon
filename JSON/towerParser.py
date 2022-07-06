@@ -1,7 +1,7 @@
 import json
 
 #JSON file öffnen und in Variable speichern
-with open('pokedex.json', 'r') as file:
+with open('../Json/pokedex.json', 'r') as file:
     json_dict = json.load(file)
 
 #JSON File zu Python Dictionary Parsen

@@ -1,6 +1,4 @@
-from pygame.font import Font
 from pygame.mixer import Sound
-from pygame.surface import SurfaceType
 
 import settings
 from entities.Test import Test
@@ -31,14 +29,16 @@ class Game:
         self.screen.fill((0, 0, 0))
 
         self.scale = 1
-        self.level = Level(self.scale)
+        self.level = Level.load_level("sample_level.dat")
         self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
         if settings.DEBUG:
-            self.test = Test(self.scale)
+            self.test = Test(self.scale, self.level.map_gird)
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
+        # self.level.save_level("test_level.dat")
+
         while self.playing:
             # Trigger clock
             time_delta = self.clock.tick() / 1000
@@ -65,6 +65,8 @@ class Game:
                         move_west = event.type == pygame.KEYDOWN
                     if event.key == pygame.K_s:
                         move_south = event.type == pygame.KEYDOWN
+                    if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
+                        self.level.level_spawn()
                     if settings.DEBUG:
                         if event.key == pygame.K_q:
                             if event.type == pygame.KEYDOWN:
@@ -95,6 +97,7 @@ class Game:
 
             if settings.DEBUG:
                 self.test.update(time_delta)
+            self.level.update(time_delta)
 
             # Render map
             self.level.render(time_delta, self.scale)

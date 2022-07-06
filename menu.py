@@ -189,7 +189,7 @@ class ControlsMenu(Menu):
 
     def check_input(self):
         if self.app.BACK_KEY:
-            self.app.curr_menu = self.app.options
+            self.app.menu = self.app.options
             self.show_display = False
 
 
@@ -202,7 +202,7 @@ class CreditsMenu(Menu):
         while self.show_display:
             self.app.check_events()
             if self.app.START_KEY or self.app.BACK_KEY:
-                self.app.curr_menu = self.app.main_menu
+                self.app.menu = self.app.main_menu
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
             self.draw_text(self.font_big, 'Credits', self.mid_w, self.mid_h - 40)

@@ -17,12 +17,12 @@ class Sprite(pygame.sprite.Sprite):
     Generic Sprit Class for Pygame Surface
     """
 
-    def __init__(self, image_path: str, position: Vector2, angle: float = 0, scale: float = 1):
+    def __init__(self, screen: SurfaceType, image: Surface, position: Vector2, angle: float = 0, scale: float = 1):
         super(Sprite, self).__init__()
-        self.image = load_png(image_path)
+        self.image = image
         self.current_image = self.image
         self.rect = self.image.get_rect()
-        self.screen = pygame.display.get_surface()
+        self.screen = screen
         self.position = position
         self.angle = angle
         self.scale = scale
