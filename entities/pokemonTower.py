@@ -23,3 +23,4 @@ def attack(self, enemy: entity.enemy):
     damage = self.level * factor
     enemy.takeLife(damage)
 
+

@@ -17,7 +17,7 @@ def parsePokemon (json_dict: dict):
         pokemon_dict[key] = value
     return pokemon_dict
 
-
+pokemon_dict = parsePokemon(json_dict)
 
 #Einzelnes Pokemon auslesen (für Konstruktor der pokemonTower Klasse!)
 def getPokemonData (name:str):

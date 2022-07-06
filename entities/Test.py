@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import pygame
+from numpy.typing import NDArray
 
 import utils.image
 from entities.navigation.Math.vector2 import Vector2
@@ -10,6 +11,7 @@ from entities.entity_factories import EnemyFactory
 from entities.spawners import EnemySpawner
 from entities.navigation.a_star import AStar
 from entities.navigation.nav_mesh import Cell, NavMesh
+from entities.tile import Tile, TileType
 
 
 class Test:
@@ -17,12 +19,26 @@ class Test:
     A Class to test the Enemy Spawn system and there pathing
     """
 
-    def __init__(self, scale):
+    def __init__(self, scale, grid: NDArray[NDArray[Tile]]):
         self.start = (5, 5)
         self.end = (50, 30)
-        self.nav_mesh = NavMesh(settings.LEVEL_WIDTH, settings.LEVEL_HEIGHT,
-                                [[Cell(Vector2((x, y))) for x in range(settings.LEVEL_WIDTH)] for y in
-                                 range(settings.LEVEL_HEIGHT)])
+        self.grid = grid
+        # [[Cell(Vector2((x, y))) for x in range(settings.LEVEL_WIDTH)] for y in
+        #                                  range(settings.LEVEL_HEIGHT)]
+        cells = []
+        for y in range(grid.shape[0]):
+            row = []
+            for x in range(grid.shape[1]):
+                cell = Cell(Vector2((x, y)))
+                if grid[y][x].tile_type == TileType.BLOCKED:
+                    cell.passable = False
+                else:
+                    cell.passable = True
+                cell.travel_cost = grid[y][x].score
+                row.append(cell)
+            cells.append(row)
+        self.nav_mesh = NavMesh(grid.shape[1], grid.shape[0],
+                                cells)
         self.current_path = None
         images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
         enemy_factory = EnemyFactory(images, scale)
@@ -41,6 +57,7 @@ class Test:
         self.start = self._pixel_to_grid_coord(x, y, scale)
         self.spawner.position = Vector2(self.start)
         print(f"Set new Start position: {self.start}")
+        print(self.grid[self.start[1]][self.start[0]])
 
     def set_end(self, x, y, scale):
         """
@@ -52,6 +69,7 @@ class Test:
         """
         self.end = self._pixel_to_grid_coord(x, y, scale)
         print(f"Set new End position: {self.end}")
+        print(self.grid[self.end[1]][self.end[0]])
 
     def spawn(self):
         self.spawner.spawn(1000)

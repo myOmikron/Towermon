@@ -1,19 +1,28 @@
-from typing import List
+from dataclasses import dataclass
+from enum import IntEnum
 
 import pygame
-from pygame.sprite import AbstractGroup
 
-from utils import image
+from entities.navigation.Math.vector2 import Vector2
 
 
-class Tile(pygame.sprite.Sprite):
-    """The base class for tiles.
+class TileType(IntEnum):
+    EMPTY = 0
+    BLOCKED = 1
+    TURRET = 2
+    SPAWN = 3
+    TARGET = 4
 
-    :param path: Path of the resource, relative to assets/
-    :param pos: Tuple of int, int, marks position of the tile
-    :param groups: List of AbstractGroups
-    """
-    def __init__(self, path: str, pos: (int, int), groups: List[AbstractGroup]):
-        super().__init__(groups)
-        self.image = image.load_png(path)
-        self.rect = self.image.get_rect(topleft=pos)
+
+@dataclass(slots=True)
+class Tile:
+    tile_type: TileType
+    score: int
+    surface_id: int
+    position: Vector2
+
+    def __init__(self, surface_id: int, position: pygame.Vector2, tile_type, score=0):
+        self.tile_type = tile_type
+        self.score = score
+        self.surface_id = surface_id
+        self.position = position
