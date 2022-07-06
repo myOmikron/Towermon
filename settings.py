@@ -8,4 +8,6 @@ TILE_SIZE = 64
 LEVEL_HEIGHT = 500
 LEVEL_WIDTH = 500
 NEIGHBOURS = [(0, 1), (1, 0), (-1, 0), (0, -1)] # (-1, 1), (1, -1), (1, 1), (-1, -1)
+
+ENEMY_LIFE = 20
 DEBUG = True
