@@ -30,28 +30,40 @@ class Player(pygame.sprite.Sprite):
 
         :param time_delta: Time in seconds since the last render cycle
         """
-        self.position = self.position[0] + self.player_speed * time_delta, self.position[1]
+        x_pos = self.position[0] + self.player_speed * time_delta
+        if x_pos >= settings.TILE_SIZE * settings.LEVEL_WIDTH:
+            x_pos = settings.TILE_SIZE * settings.LEVEL_WIDTH
+        self.position = x_pos, self.position[1]
 
     def move_west(self, time_delta: float):
         """Move the player in west direction
 
         :param time_delta: Time in seconds since the last render cycle
         """
-        self.position = self.position[0] - self.player_speed * time_delta, self.position[1]
+        x_pos = self.position[0] - self.player_speed * time_delta
+        if x_pos <= 0:
+            x_pos = 0
+        self.position = x_pos, self.position[1]
 
     def move_south(self, time_delta: float):
         """Move the player in south direction
 
         :param time_delta: Time in seconds since the last render cycle
         """
-        self.position = self.position[0], self.position[1] + self.player_speed * time_delta
+        y_pos = self.position[1] + self.player_speed * time_delta
+        if y_pos >= settings.TILE_SIZE * settings.LEVEL_HEIGHT:
+            y_pos = settings.TILE_SIZE * settings.LEVEL_HEIGHT
+        self.position = self.position[0], y_pos
 
     def move_north(self, time_delta: float):
         """Move the player in north direction
 
         :param time_delta: Time in seconds since the last render cycle
         """
-        self.position = self.position[0], self.position[1] - self.player_speed * time_delta
+        y_pos = self.position[1] - self.player_speed * time_delta
+        if y_pos <= 0:
+            y_pos = 0
+        self.position = self.position[0], y_pos
 
     def render(self, time_delta: float, scale: float):
         """Render the player.
