@@ -29,7 +29,7 @@ class EntitySpawner:
         """
         for entity in list(self.on_the_way):
             entity.update(delta_time)
-            if len(entity.path) < 1:
+            if len(entity.path) <= 0:
                 self.dead.append(entity)
                 self.on_the_way.remove(entity)
 

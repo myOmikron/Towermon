@@ -6,6 +6,7 @@ from typing import Callable, Dict, DefaultDict, Optional, List
 
 from entities.navigation.Math.vector2 import Vector2
 from entities.navigation.nav_mesh import PrioritizedItem
+from entities.tile import Tile
 
 
 @dataclass(slots=False)
@@ -14,6 +15,7 @@ class AStar:
     cost_to_gol: Callable[[Vector2, Vector2], float]
     # calculate the cost to next Cell
     cot_to_next_cell: Callable[[Vector2, Vector2], float]
+    visited: set[Tile] = field(default_factory=lambda: set())
     open_set: PriorityQueue = field(default_factory=lambda: PriorityQueue())
     came_from: Dict = field(default_factory=lambda: dict())
     g_score: DefaultDict[Vector2, float] = field(default_factory=lambda: defaultdict(lambda: inf))
@@ -51,7 +53,7 @@ class AStar:
                     self.came_from[neighbor.position] = current
                     self.g_score[neighbor.position] = tentative_g_score
                     self.f_score[neighbor.position] = tentative_g_score + self.cost_to_gol(neighbor.position, end) + neighbor.travel_cost
-                    if not neighbor.visited:
-                        neighbor.visited = True
+                    if neighbor not in self.visited:
                         self.open_set.put(PrioritizedItem(self.f_score[neighbor.position], neighbor.position))
+                        self.visited.add(neighbor)
         return None

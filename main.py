@@ -1,3 +1,4 @@
+import pygame
 from pygame.mixer import Sound
 
 import settings
@@ -33,11 +34,12 @@ class Game:
         self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
         if settings.DEBUG:
-            self.test = Test(self.scale, self.level.map_gird)
+            self.test = Test(self.scale, self.level.map.grid)
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
-        # self.level.save_level("test_level.dat")
+        self.level.start(self.screen)
+        self.level.render(self.scale)
 
         while self.playing:
             # Trigger clock
@@ -55,6 +57,10 @@ class Game:
                     elif event.y > 0:
                         if self.scale < 2:
                             self.scale *= 1.1
+                # Handle selecting
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    # print(event.button)
+                    self.level.highlight(pygame.mouse.get_pos())
                 # Handle player move events
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
                     if event.key == pygame.K_d:
@@ -65,8 +71,8 @@ class Game:
                         move_west = event.type == pygame.KEYDOWN
                     if event.key == pygame.K_s:
                         move_south = event.type == pygame.KEYDOWN
-                    if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
-                        self.level.level_spawn()
+                    #if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
+                    #    self.level.level_spawn()
                     if settings.DEBUG:
                         if event.key == pygame.K_q:
                             if event.type == pygame.KEYDOWN:
@@ -100,7 +106,7 @@ class Game:
             self.level.update(time_delta)
 
             # Render map
-            self.level.render(time_delta, self.scale)
+            self.level.render(self.scale)
 
             if settings.DEBUG:
                 self.test.render(self.scale)
