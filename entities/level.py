@@ -95,7 +95,9 @@ class Level:
 
         print(paths)
 
-        level.spawns = [EnemySpawner(dead=[], on_the_way=[], spawned=[], path=path, position=spawn, factory=enemy_factory, last_delta=0) for spawn, path in zip(spawns, paths)]
+        level.spawns = [
+            EnemySpawner(dead=[], on_the_way=[], spawned=[], path=path, position=spawn, factory=enemy_factory,
+                         last_delta=0) for spawn, path in zip(spawns, paths)]
 
         level.target = target
         return level
@@ -124,6 +126,26 @@ class Level:
         num_x = math.ceil(screen_width / scaled_tile_size)
         num_y = math.ceil(screen_height / scaled_tile_size)
         return num_x, num_y
+
+    def add_tile(self, tile: Tile, position: Vector2):
+        """
+        Add a tile to the given position on the map_grid
+        :param tile: tile you want to add
+        :param position: game world coordinates of the tile
+        :return: 
+        """
+        self.map_gird[position.y][position.x] = tile
+        scaled_tile_size = round(settings.TILE_SIZE * self.scale)
+        self.current_screen.blit(
+            pygame.transform.scale(
+                self.tiles[self.map_gird[position.y][position.x].surface_id],
+                (scaled_tile_size, scaled_tile_size)
+            ),
+            (
+                position.x * scaled_tile_size,
+                position.y * scaled_tile_size
+            )
+        )
 
     def create_map(self):
         """Renders a default map"""
