@@ -9,7 +9,7 @@ from entities.navigation.Math.vector2 import Vector2
 from entities.sprite import AnimatedSprite
 
 from random import choice
-from JSON import jsonParser
+from JSON import json_parser
 import settings
 
 MAGIC_NUMBER = 0.04
@@ -91,11 +91,10 @@ class Enemy(Entity, AnimatedSprite):
         self.animation_speed = 1 / (self.speed * 3)
         self.angle = 0
         self.life = settings.ENEMY_LIFE
-        self.type = choice(jsonParser.getTypeList())
+        self.type = choice(json_parser.get_type_list())
 
-    def takeLife(self, damage: int):
+    def take_life(self, damage: int):
         self.life = self.life - damage
-
 
     def update(self, delta_time: float) -> None:
         Entity.update(self, delta_time)

@@ -200,6 +200,7 @@ class App:
             if self.playing:
                 pygame.mixer.music.load('assets/Route 1.mid')
                 pygame.mixer.music.play(-1,0,0)
+                self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing

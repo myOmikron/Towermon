@@ -16,7 +16,7 @@ from entities.navigation.a_star import AStar
 from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
-from entities.pokemonTower import PokemonTower
+from entities.pokemon_tower import PokemonTower
 from utils import image
 
 
@@ -57,10 +57,10 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile((int(position.x), int(position.y)))
 
-    def _render_tower(self, position: Tuple[int,int]):
-        x,y = position
+    def _render_tower(self, position: Tuple[int, int]):
+        x, y = position
         tower = self.towers[y][x]
-        self._render_tile(tower.getImage, position)
+        self._render_tile(tower.get_image, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int]):
         x, y = position
@@ -87,7 +87,6 @@ class Map:
                 y * scaled_tile_size
             )
         )
-
 
     def _calc_visible_tiles(self) -> Tuple[int, int]:
         """Calculates the amount of visible tiles for the screen.
@@ -320,7 +319,8 @@ class Level:
         check if the current wave if over
         :return:
         """
-        self.wave_done = all([len(spawner.on_the_way) == 0 for spawner in self.spawners]) and all([len(spawner.spawned) == 0 for spawner in self.spawners])
+        self.wave_done = all([len(spawner.on_the_way) == 0 for spawner in self.spawners]) and all(
+            [len(spawner.spawned) == 0 for spawner in self.spawners])
 
     def update(self, delta_time: float) -> None:
         """
