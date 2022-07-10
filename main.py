@@ -148,7 +148,8 @@ class App:
 
         # Set fullscreen && double buffering for performance improvement
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
-
+        pygame.mixer.music.load('assets/Ingido Plateau.mid')
+        pygame.mixer.music.play(1, 0, 0)
         # Set allowed events for performance improvement
         pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
@@ -197,6 +198,8 @@ class App:
         while self.running:
             self.menu.display_menu()
             if self.playing:
+                pygame.mixer.music.load('assets/Route 1.mid')
+                pygame.mixer.music.play(-1,0,0)
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing
