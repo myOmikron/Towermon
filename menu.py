@@ -152,23 +152,29 @@ class VolumeMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.state = 'vol_up'
+        self.volume = pygame.mixer.music.get_volume()
+        self.message = 'Use the Up and Down keys to change the volume!'
 
-    # Todo
 
     def display_menu(self):
         self.show_display = True
+
         while self.show_display:
             self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
-            self.draw_text(self.font_big, 'Volume', self.mid_w, self.mid_h - 40)
-            # self.draw_cursor()
+            self.draw_text(self.font_big, 'Volume', self.mid_w, self.mid_h-40)
+            self.draw_text(self.font, self.message, self.mid_w, self.mid_h)
             self.blit_()
 
     def check_input(self):
         if self.app.BACK_KEY:
             self.app.menu = self.app.options
             self.show_display = False
+        elif self.app.UP_KEY: self.volume += 0.1
+        elif self.app.DOWN_KEY: self.volume -= 0.1
+        pygame.mixer.music.set_volume(self.volume)
 
 
 class ControlsMenu(Menu):
