@@ -25,20 +25,8 @@ class Test:
         self.grid = grid
         # [[Cell(Vector2((x, y))) for x in range(settings.LEVEL_WIDTH)] for y in
         #                                  range(settings.LEVEL_HEIGHT)]
-        cells = []
-        for y in range(grid.shape[0]):
-            row = []
-            for x in range(grid.shape[1]):
-                cell = Cell(Vector2((x, y)))
-                if grid[y][x].tile_type == TileType.BLOCKED:
-                    cell.passable = False
-                else:
-                    cell.passable = True
-                cell.travel_cost = grid[y][x].score
-                row.append(cell)
-            cells.append(row)
         self.nav_mesh = NavMesh(grid.shape[1], grid.shape[0],
-                                cells)
+                                grid)
         self.current_path = None
         images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
         enemy_factory = EnemyFactory(images, scale)

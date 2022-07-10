@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from enum import IntEnum
 
-import pygame
-
 from entities.navigation.Math.vector2 import Vector2
+from entities.navigation.nav_mesh import Cell
 
 
 class TileType(IntEnum):
@@ -15,14 +14,19 @@ class TileType(IntEnum):
 
 
 @dataclass(slots=True)
-class Tile:
+class Tile(Cell):
     tile_type: TileType
-    score: int
     surface_id: int
-    position: Vector2
+    highlighted: bool
 
-    def __init__(self, surface_id: int, position: pygame.Vector2, tile_type, score=0):
+    def __init__(self, surface_id: int, position: Vector2, tile_type: TileType, score: int = 0):
+        passable = True
+        if tile_type == TileType.BLOCKED or tile_type == TileType.TURRET:
+            passable = False
+        Cell.__init__(self, position=position, visited=False, travel_cost=score, passable=passable)
         self.tile_type = tile_type
-        self.score = score
         self.surface_id = surface_id
-        self.position = position
+        self.highlighted = False
+
+    def __hash__(self):
+        return Cell.__hash__(self)

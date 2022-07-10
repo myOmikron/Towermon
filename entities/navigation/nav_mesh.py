@@ -1,6 +1,8 @@
 from dataclasses import field, dataclass
 from typing import List, Tuple, Any, Dict
 
+from numpy.typing import NDArray
+
 import settings
 from .Math.vector2 import Vector2
 
@@ -8,9 +10,9 @@ from .Math.vector2 import Vector2
 @dataclass(slots=True)
 class Cell:
     position: Vector2
-    visited: bool = False
-    travel_cost: int = 0
-    passable: bool = True
+    visited: bool
+    travel_cost: int
+    passable: bool
 
     def __hash__(self):
         return hash(self.position)
@@ -26,12 +28,12 @@ class PrioritizedItem:
 class NavMesh:
     width: int
     height: int
-    grid: List[List[Cell]]
+    grid: NDArray[NDArray[Cell]]
     paths: Dict[Tuple[Vector2, Vector2], List[Cell]] = field(init=False, default_factory=lambda: dict())
 
     def get_cell(self, position: Vector2) -> Cell:
         if 0 <= position.x < self.width and 0 <= position.y < self.height:
-            return self.grid[position.y][position.x]
+            return self.grid[int(position.y)][int(position.x)]
         raise IndexError(f"{position.x, position.y} <= 0 oder {position.x, position.y} > {self.width, self.height}")
 
     def get_neighbours(self, position: Vector2):
