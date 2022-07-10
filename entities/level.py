@@ -17,6 +17,7 @@ from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
 from entities.pokemonTower import PokemonTower
+from entities.wallet import Wallet
 from utils import image
 
 
@@ -148,6 +149,7 @@ class Timer:
             time = self.font.render(time, True, pygame.Color("RED"))
             self.screen.blit(time, (int(self.position.x), int(self.position.y)))
 
+
     def update(self, delta_time):
         if not self.finished:
             self.duration -= delta_time
@@ -165,6 +167,7 @@ class Level:
     target: Vector2
     map: Map
     timer: Timer
+    coins: Wallet
     wave_done: bool
     spawn_frequenz: float = 1
     stage: int = 0
@@ -204,6 +207,7 @@ class Level:
         :return:
         """
         self.timer = Timer(10, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
+        self.coins = Wallet(screen)
 
     @staticmethod
     def _pixel_to_grid_coord(x: int, y: int, scale) -> Tuple[int, int]:
@@ -353,3 +357,4 @@ class Level:
         for spawner in self.spawners:
             spawner.render(scale)
         self.timer.render(scale)
+        self.coins.render()
