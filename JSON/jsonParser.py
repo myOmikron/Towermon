@@ -2,10 +2,10 @@ import json
 from pathlib import Path
 
 #JSON file öffnen und in Variable speichern
-pokedexPath = Path('../JSON/pokedex.json')
+pokedexPath = Path('JSON/pokedex.json')
 pokedex_dict = json.load(pokedexPath.open())
 
-typePath = Path('../JSON/typesystem.json')
+typePath = Path('JSON/typesystem.json')
 type_dict = json.load(typePath.open())
 
 #JSON File zu Python Dictionary Parsen
@@ -17,7 +17,6 @@ def parsePokemon (json_dict: dict):
         pokemon_dict[key] = value
     return pokemon_dict
 
-pokemon_dict = parsePokemon(json_dict)
 
 #Einzelnes Pokemon auslesen (für Konstruktor der pokemonTower Klasse!)
 def getPokemonData (name:str):

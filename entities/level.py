@@ -16,6 +16,7 @@ from entities.navigation.a_star import AStar
 from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
+from entities.pokemonTower import PokemonTower
 from utils import image
 
 
@@ -26,6 +27,7 @@ class Map:
     game_screen: SurfaceType
     map_screen: Surface
     grid: NDArray[NDArray[Tile]]
+    towers: NDArray[NDArray[PokemonTower]]
     tiles: NDArray[Surface]
     spawns: List[Vector2]
     target: Vector2
@@ -39,6 +41,7 @@ class Map:
         self.game_screen = game_screen
         self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.grid = grid
+        self.towers = np.ndarray(shape=grid.shape)
         self.tiles = tiles
         self.spawns = spawns
         self.target = target
@@ -53,6 +56,11 @@ class Map:
         """
         self.grid[position.y][position.x] = tile
         self._render_tile((int(position.x), int(position.y)))
+
+    def _render_tower(self, position: Tuple[int,int]):
+        x,y = position
+        tower = self.towers[y][x]
+        self._render_tile(tower.getImage, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int]):
         x, y = position
@@ -80,6 +88,7 @@ class Map:
             )
         )
 
+
     def _calc_visible_tiles(self) -> Tuple[int, int]:
         """Calculates the amount of visible tiles for the screen.
             self.scale is used to determine to current scaling factor
@@ -103,6 +112,8 @@ class Map:
                 for x in range(0, num_x + 2):
                     if x < self.height and y < self.width:
                         self._render_tile_from_grid((x, y))
+                        if isinstance(self.towers[y][x], PokemonTower):
+                            self._render_tower((x, y))
 
     def update(self, delta_time: float) -> None:
         ...
