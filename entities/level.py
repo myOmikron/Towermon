@@ -183,8 +183,7 @@ class Level:
         self.target = map.target
         self.wave_done = False
 
-        images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
-        enemy_factory = EnemyFactory(images, 1)
+        enemy_factory = EnemyFactory(1)
         nav_mesh = NavMesh(height, width, map.grid)
 
         paths = [nav_mesh.find_path(spawn, map.target, AStar) for spawn in map.spawns]

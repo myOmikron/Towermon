@@ -6,6 +6,7 @@ from pygame.surface import Surface
 
 from entities.entity import Entity, Enemy
 from entities.navigation.Math.vector2 import Vector2
+from utils import image
 
 
 class EntityFactory(ABC):
@@ -23,10 +24,9 @@ class EnemyFactory(EntityFactory):
     instantiation
     """
 
-    def __init__(self, images, scale, *groups: AbstractGroup):
-        self.images = images
+    def __init__(self, scale, *groups: AbstractGroup):
         self.scale = scale
         self.groups = groups
 
     def get_entity(self, position: Vector2, path: List[Vector2]) -> Enemy:
-        return Enemy(images=self.images, path=path, position=position, *self.groups)
+        return Enemy(path=path, position=position, *self.groups)

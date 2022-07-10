@@ -15,12 +15,14 @@ class PokemonTower:
         self.level = 1
         self.range = 10
         self.rate = 2
+        self.cost = 1
 
     # Stufenweise Verbesserung durch Münzen
     def train(self):
         self.level += 1
         self.range += 2
         self.rate += 1
+        self.cost = self.cost + (2*self.level)
 
     # Greift einen Feind an, und zieht im Lebenspunkte ab
     def attack(self, enemy: entity.Enemy):
