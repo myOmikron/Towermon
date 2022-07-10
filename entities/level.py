@@ -19,6 +19,8 @@ from entities.tile import Tile, TileType
 from entities.pokemon_tower import PokemonTower
 from entities.wallet import Wallet
 from utils import image
+from JSON import json_parser
+from random import choice
 
 
 class Map:
@@ -42,11 +44,21 @@ class Map:
         self.game_screen = game_screen
         self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.grid = grid
-        self.towers = np.ndarray(shape=grid.shape)
+        self.towers = np.ndarray(shape=grid.shape, dtype=PokemonTower)
         self.tiles = tiles
         self.spawns = spawns
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
+
+        #TODO remove sample towers!
+        i = 0
+        while i < 5:
+            list = [12,3,4,5,6,7,8,9,14,1,13,25]
+            x = choice(list)
+            y = choice(list)
+            pokemon = choice(json_parser.get_pokemon_list())
+            self.towers[y][x] = PokemonTower(pokemon)
+            i+=1
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -58,10 +70,12 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile((int(position.x), int(position.y)))
 
+
     def _render_tower(self, position: Tuple[int, int]):
         x, y = position
         tower = self.towers[y][x]
-        self._render_tile(tower.get_image, position)
+        img = tower.get_image()
+        self._render_tile(img, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int]):
         x, y = position
@@ -183,8 +197,7 @@ class Level:
         self.target = map.target
         self.wave_done = False
 
-        images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
-        enemy_factory = EnemyFactory(images, 1)
+        enemy_factory = EnemyFactory(1)
         nav_mesh = NavMesh(height, width, map.grid)
 
         paths = [nav_mesh.find_path(spawn, map.target, AStar) for spawn in map.spawns]
@@ -207,6 +220,12 @@ class Level:
         """
         self.timer = Timer(10, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
         self.coins = Wallet(screen)
+
+    def build_tower(self, tower: PokemonTower, position: Vector2):
+        if tower.cost >= self.coins:
+            self.coins -= tower.cost
+            self.map.towers[position.y, position.x] = tower
+
 
     @staticmethod
     def _pixel_to_grid_coord(x: int, y: int, scale) -> Tuple[int, int]:

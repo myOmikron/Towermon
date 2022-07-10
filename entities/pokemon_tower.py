@@ -5,22 +5,23 @@ from utils import image
 
 
 class PokemonTower:
-    def __init__(self, pokemon_name: str, tile: tile):
+    def __init__(self, pokemon_name: str):
         pokemon_data = parser.get_pokemon_data(pokemon_name)
         self.id = pokemon_data["id"]
         self.name = pokemon_data["name"]
         self.type = pokemon_data["type"]
 
-        self.tile = tile
         self.level = 1
         self.range = 10
         self.rate = 2
+        self.cost = 1
 
     # Stufenweise Verbesserung durch Münzen
     def train(self):
         self.level += 1
         self.range += 2
         self.rate += 1
+        self.cost = self.cost + (2*self.level)
 
     # Greift einen Feind an, und zieht im Lebenspunkte ab
     def attack(self, enemy: entity.Enemy):
@@ -28,9 +29,9 @@ class PokemonTower:
         damage = self.level * factor
         enemy.take_life(damage)
 
-    @staticmethod
-    def get_image(pokemon_name: str):
-        return image.load_png(pokemon_name + '.png')
+    def get_image(self):
+        img = image.load_png(self.name + '.png')
+        return img
 
 
 class Projectile:

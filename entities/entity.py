@@ -4,7 +4,7 @@ from typing import List
 from numpy.typing import NDArray
 from pygame.sprite import AbstractGroup
 from pygame.surface import Surface
-
+from utils import image
 from entities.navigation.Math.vector2 import Vector2
 from entities.sprite import AnimatedSprite
 
@@ -84,14 +84,16 @@ class Enemy(Entity, AnimatedSprite):
     consists of Entity and Sprite to combine movement with grafik
     """
 
-    def __init__(self, position: Vector2, path: List[Vector2], images: NDArray[NDArray[Surface]],
+    def __init__(self, position: Vector2, path: List[Vector2],
                  *groups: AbstractGroup):
+        self.type = choice(json_parser.get_type_list())
+        self.images = image.load_tile_map("trainer/"+self.type+".png", (32, 48))
         Entity.__init__(self, path, position)
-        AnimatedSprite.__init__(self, images, position, *groups)
+        AnimatedSprite.__init__(self, self.images, position, *groups)
         self.animation_speed = 1 / (self.speed * 3)
         self.angle = 0
         self.life = settings.ENEMY_LIFE
-        self.type = choice(json_parser.get_type_list())
+
 
     def take_life(self, damage: int):
         self.life = self.life - damage

@@ -33,6 +33,12 @@ def get_type_list() -> List[dict]:
         type_list.append(entry)
     return type_list
 
+def get_pokemon_list()-> List[dict]:
+    list = []
+    for entry in pokedex_dict:
+        list.append(entry['name'])
+    print(list)
+    return list
 
 def get_damage_factor(attack: str, enemy_type: str) -> float:
     return type_dict[attack][enemy_type]
