@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Callable
 from copy import deepcopy
 
 from entities.entity import Entity, Enemy
@@ -16,6 +16,7 @@ class EntitySpawner:
     spawned: List[Entity]
     factory: EntityFactory
     last_delta: float
+    health_callback: Callable
     """
     Entity Spawner, can spawn entities and control their pathing
     """
@@ -30,6 +31,7 @@ class EntitySpawner:
         for entity in list(self.on_the_way):
             entity.update(delta_time)
             if len(entity.path) <= 0:
+                self.health_callback(-10)
                 self.dead.append(entity)
                 self.on_the_way.remove(entity)
 

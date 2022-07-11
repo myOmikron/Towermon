@@ -17,6 +17,7 @@ from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
 from entities.pokemon_tower import PokemonTower
+from entities.ui.health_bar import HealthBar
 from entities.wallet import Wallet
 from utils import image
 from json_utils import json_parser
@@ -80,6 +81,8 @@ class Map:
         x, y = position
         tile = self.grid[y][x]
         self._render_tile(self.tiles[tile.surface_id], position)
+        if self.towers[y][x]:
+            self._render_tower((x, y))
         if tile.highlighted:
             self._render_tile(self.high_light, position)
 
@@ -182,6 +185,8 @@ class Level:
     wave_done: bool
     spawn_frequenz: float = 1
     stage: int = 0
+    health_bar: HealthBar
+    game_over: bool
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
@@ -194,6 +199,8 @@ class Level:
         self.map = map
         self.target = map.target
         self.wave_done = False
+        self.game_over = False
+        self.health_bar = HealthBar(game_screen, 200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
 
         enemy_factory = EnemyFactory(1)
         nav_mesh = NavMesh(height, width, map.grid)
@@ -207,7 +214,7 @@ class Level:
             path=path,
             position=spawn,
             factory=enemy_factory,
-            last_delta=0)
+            last_delta=0, health_callback=self.health_bar.update_health)
             for spawn, path in zip(map.spawns, paths)]
 
     def start(self, screen):
@@ -291,16 +298,16 @@ class Level:
         level = Level(grid.shape[0], grid.shape[1], pygame.display.get_surface(), map)
 
         # images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
-        enemy_factory = EnemyFactory(1)
-        nav_mesh = NavMesh(grid.shape[1], grid.shape[0], grid)
+        # enemy_factory = EnemyFactory(1)
+        # nav_mesh = NavMesh(grid.shape[1], grid.shape[0], grid)
 
-        paths = [nav_mesh.find_path(spawn, target, AStar) for spawn in spawns]
+        # paths = [nav_mesh.find_path(spawn, target, AStar) for spawn in spawns]
 
-        level.spawns = [
-            EnemySpawner(dead=[], on_the_way=[], spawned=[], path=path, position=spawn, factory=enemy_factory,
-                         last_delta=0) for spawn, path in zip(spawns, paths)]
+        # level.spawns = [
+        #    EnemySpawner(dead=[], on_the_way=[], spawned=[], path=path, position=spawn, factory=enemy_factory,
+        #                 last_delta=0, health_callback=None) for spawn, path in zip(spawns, paths)]
 
-        level.target = target
+        # level.target = target
         # level.render(1)
         return level
 
@@ -330,7 +337,7 @@ class Level:
         :return:
         """
         self.stage += 1
-        self.spawn_frequenz = 1 / (self.stage)
+        self.spawn_frequenz = 1 / self.stage
         for spawner in self.spawners:
             spawner.spawn(self.stage * 10)
 
@@ -349,6 +356,10 @@ class Level:
         :param delta_time:
         :return:
         """
+
+        if not self.health_bar.alive:
+            self.game_over = True
+
         if self.timer.finished and self.wave_done:
             self.update_stage()
 
@@ -374,3 +385,4 @@ class Level:
             spawner.render(scale)
         self.timer.render(scale)
         self.coins.render()
+        self.health_bar.render(1)

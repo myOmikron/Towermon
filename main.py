@@ -101,6 +101,9 @@ class Game:
             elif move_south:
                 self.player.move_south(time_delta)
 
+            if self.level.game_over:
+                self.playing = False
+
             if settings.DEBUG:
                 self.test.update(time_delta)
             self.level.update(time_delta)
