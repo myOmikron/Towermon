@@ -1,4 +1,4 @@
-from JSON import json_parser as parser
+from json_utils import json_parser as parser
 from entities import entity, tile
 from pygame import Color, draw
 from utils import image

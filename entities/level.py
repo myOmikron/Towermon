@@ -19,7 +19,7 @@ from entities.tile import Tile, TileType
 from entities.pokemon_tower import PokemonTower
 from entities.wallet import Wallet
 from utils import image
-from JSON import json_parser
+from json_utils import json_parser
 from random import choice
 
 
@@ -50,15 +50,15 @@ class Map:
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
 
-        #TODO remove sample towers!
+        # TODO remove sample towers!
         i = 0
         while i < 5:
-            list = [12,3,4,5,6,7,8,9,14,1,13,25]
+            list = [12, 3, 4, 5, 6, 7, 8, 9, 14, 1, 13, 25]
             x = choice(list)
             y = choice(list)
             pokemon = choice(json_parser.get_pokemon_list())
             self.towers[y][x] = PokemonTower(pokemon)
-            i+=1
+            i += 1
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -68,8 +68,7 @@ class Map:
         :return:
         """
         self.grid[position.y][position.x] = tile
-        self._render_tile((int(position.x), int(position.y)))
-
+        self._render_tile_from_grid((int(position.x), int(position.y)))
 
     def _render_tower(self, position: Tuple[int, int]):
         x, y = position
@@ -103,7 +102,6 @@ class Map:
             )
         )
 
-
     def _calc_visible_tiles(self) -> Tuple[int, int]:
         """Calculates the amount of visible tiles for the screen.
             self.scale is used to determine to current scaling factor
@@ -127,7 +125,7 @@ class Map:
                 for x in range(0, num_x + 2):
                     if x < self.height and y < self.width:
                         self._render_tile_from_grid((x, y))
-                        if isinstance(self.towers[y][x], PokemonTower):
+                        if self.towers[y][x]:
                             self._render_tower((x, y))
 
     def update(self, delta_time: float) -> None:
@@ -159,7 +157,7 @@ class Timer:
 
     def render(self, scale):
         if not self.finished:
-            time = str(f"{self.duration:.2f}")
+            time = str(f"{self.duration:.0f}")
             time = self.font.render(time, True, pygame.Color("RED"))
             self.screen.blit(time, (int(self.position.x), int(self.position.y)))
 
@@ -225,7 +223,6 @@ class Level:
         if tower.cost >= self.coins:
             self.coins -= tower.cost
             self.map.towers[position.y, position.x] = tower
-
 
     @staticmethod
     def _pixel_to_grid_coord(x: int, y: int, scale) -> Tuple[int, int]:
@@ -293,8 +290,8 @@ class Level:
 
         level = Level(grid.shape[0], grid.shape[1], pygame.display.get_surface(), map)
 
-        images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
-        enemy_factory = EnemyFactory(images, 1)
+        # images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
+        enemy_factory = EnemyFactory(1)
         nav_mesh = NavMesh(grid.shape[1], grid.shape[0], grid)
 
         paths = [nav_mesh.find_path(spawn, target, AStar) for spawn in spawns]

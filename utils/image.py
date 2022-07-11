@@ -12,7 +12,7 @@ def load_png(name) -> pygame.Surface:
     :param name: Name of the file in assets/
     :return: Surface
     """
-    fullname = os.path.join('assets', name)
+    fullname = os.path.join('assets/graphics/', name)
     try:
         image = pygame.image.load(fullname)
         if image.get_alpha() is None:

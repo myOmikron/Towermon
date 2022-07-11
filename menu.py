@@ -17,8 +17,8 @@ class Menu:
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
         """ offset for the cursor, that it is next to Menu Options"""
         self.offset = - 100
-        self.font = pygame.font.Font("assets/Gameplay.ttf", 20)
-        self.font_big = pygame.font.Font("assets/Gameplay.ttf", 40)
+        self.font = pygame.font.Font("assets/Font/Gameplay.ttf", 20)
+        self.font_big = pygame.font.Font("assets/Font/Gameplay.ttf", 40)
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))

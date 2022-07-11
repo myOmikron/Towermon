@@ -141,7 +141,7 @@ class App:
 
     def __init__(self):
         # Initialize the audio mixer
-        pygame.mixer.pre_init(44100, 16, 2, 4096)
+        pygame.mixer.pre_init(44100, 32, 2, 4096)
 
         # Game init
         pygame.init()
@@ -149,7 +149,7 @@ class App:
         # Set fullscreen && double buffering for performance improvement
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
         pygame.mixer.music.set_volume(0.1)
-        pygame.mixer.music.load('assets/Ingido Plateau.mid')
+        pygame.mixer.music.load('assets/audio/Ingido Plateau.mid')
         pygame.mixer.music.play(1, 0, 0)
 
         # Set allowed events for performance improvement
@@ -167,8 +167,8 @@ class App:
 
         # set main_menu as current menu
         self.menu = self.main_menu
-        self.font_name = "assets/Gameplay.ttf"
-        self.click_sound = pygame.mixer.Sound('Sounds/click.wav')
+        self.font_name = "assets/Font/Gameplay.ttf"
+        self.click_sound = pygame.mixer.Sound('assets/audio/click.wav')
         self.game = Game(self.screen)
 
     def check_events(self):
@@ -200,7 +200,7 @@ class App:
         while self.running:
             self.menu.display_menu()
             if self.playing:
-                pygame.mixer.music.load('assets/Route 1.mid')
+                pygame.mixer.music.load('assets/audio/Route 1.mid')
                 pygame.mixer.music.play(-1,0,0)
                 self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing

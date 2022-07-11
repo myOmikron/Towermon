@@ -9,7 +9,7 @@ from entities.navigation.Math.vector2 import Vector2
 from entities.sprite import AnimatedSprite
 
 from random import choice
-from JSON import json_parser
+from json_utils import json_parser
 import settings
 
 MAGIC_NUMBER = 0.04
