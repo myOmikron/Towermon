@@ -30,7 +30,7 @@ class EntitySpawner:
         """
         for entity in list(self.on_the_way):
             entity.update(delta_time)
-            if len(entity.path) <= 0:
+            if len(entity.path) <= 0 and entity.at_goal:
                 self.health_callback(-10)
                 self.dead.append(entity)
                 self.on_the_way.remove(entity)

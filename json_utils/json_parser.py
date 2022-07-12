@@ -34,11 +34,10 @@ def get_type_list() -> List[dict]:
     return type_list
 
 
-def get_pokemon_list() -> List[dict]:
+def get_pokemon_list() -> List[str]:
     list = []
     for entry in pokedex_dict:
         list.append(entry['name'])
-    print(list)
     return list
 
 

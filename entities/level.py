@@ -17,6 +17,7 @@ from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
 from entities.pokemon_tower import PokemonTower
+from entities.ui.button import ButtonGrid, Button, generate_button_image, generate_all_buttons
 from entities.ui.health_bar import HealthBar
 from entities.wallet import Wallet
 from utils import image
@@ -43,7 +44,7 @@ class Map:
         self.height = height
         self.scale = 0.9
         self.game_screen = game_screen
-        self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+        self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT - settings.UI_HEIGHT))
         self.grid = grid
         self.towers = np.ndarray(shape=grid.shape, dtype=PokemonTower)
         self.tiles = tiles
@@ -113,6 +114,7 @@ class Map:
         """
         scaled_tile_size = round(settings.TILE_SIZE * self.scale)
         screen_width, screen_height = self.game_screen.get_size()
+        screen_height = screen_height - settings.UI_HEIGHT
 
         num_x = math.ceil(screen_width / scaled_tile_size)
         num_y = math.ceil(screen_height / scaled_tile_size)
@@ -126,7 +128,7 @@ class Map:
             self.map_screen.fill((68, 167, 169))
             for y in range(0, num_y + 2):
                 for x in range(0, num_x + 2):
-                    if x < self.height and y < self.width:
+                    if y < self.height and x < self.width:
                         self._render_tile_from_grid((x, y))
                         if self.towers[y][x]:
                             self._render_tower((x, y))
@@ -187,6 +189,7 @@ class Level:
     stage: int = 0
     health_bar: HealthBar
     game_over: bool
+    ui: ButtonGrid
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
@@ -200,10 +203,16 @@ class Level:
         self.target = map.target
         self.wave_done = False
         self.game_over = False
+
+        buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
+
         self.health_bar = HealthBar(game_screen, 200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
 
+        self.ui = ButtonGrid(settings.SCREEN_WIDTH, settings.UI_HEIGHT,
+                             (0, settings.SCREEN_HEIGHT - settings.UI_HEIGHT), buttons, game_screen)
+
         enemy_factory = EnemyFactory(1)
-        nav_mesh = NavMesh(height, width, map.grid)
+        nav_mesh = NavMesh(width, height, map.grid)
 
         paths = [nav_mesh.find_path(spawn, map.target, AStar) for spawn in map.spawns]
 
@@ -293,9 +302,9 @@ class Level:
             image.load_png("pokal.png")
         ])
 
-        map = Map(grid.shape[0], grid.shape[1], pygame.display.get_surface(), grid, tiles, spawns, target)
+        map = Map(grid.shape[1], grid.shape[0], pygame.display.get_surface(), grid, tiles, spawns, target)
 
-        level = Level(grid.shape[0], grid.shape[1], pygame.display.get_surface(), map)
+        level = Level(grid.shape[1], grid.shape[0], pygame.display.get_surface(), map)
 
         # images = utils.image.load_tile_map("trainer_TEAMROCKET_M.png", (32, 48))
         # enemy_factory = EnemyFactory(1)
@@ -327,9 +336,13 @@ class Level:
         :return:
         """
         x, y = position
-        x, y = Level._pixel_to_grid_coord(x, y, self.scale)
-        self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
-        self.map._render_tile_from_grid((x, y))
+        if 0 <= x <= settings.SCREEN_WIDTH and 0 <= y <= settings.SCREEN_HEIGHT - settings.UI_HEIGHT:
+            x, y = Level._pixel_to_grid_coord(x, y, self.scale)
+            if x < self.map.width and y < self.map.height:
+                self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                self.map._render_tile_from_grid((x, y))
+            return
+        self.ui.click(position)
 
     def update_stage(self):
         """
@@ -357,8 +370,8 @@ class Level:
         :return:
         """
 
-        if not self.health_bar.alive:
-            self.game_over = True
+        # if not self.health_bar.alive:
+        #    self.game_over = True
 
         if self.timer.finished and self.wave_done:
             self.update_stage()
@@ -386,3 +399,4 @@ class Level:
         self.timer.render(scale)
         self.coins.render()
         self.health_bar.render(1)
+        self.ui.render()

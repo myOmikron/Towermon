@@ -36,10 +36,12 @@ def load_tile_map(name: str, tile_dim: Tuple[int, int]) -> NDArray[NDArray[pygam
     tile_map_rect = tile_map.get_rect()
     w = tile_map_rect.width // tile_dim[0]
     h = tile_map_rect.height // tile_dim[1]
-    array = np.ndarray((w, h)).astype(pygame.Surface)
+    print(w, h)
+    array = np.ndarray((h, w)).astype(pygame.Surface)
     x, y = 0, 0
     for i in range(h):
         for j in range(w):
+            print(i, j)
             array[i][j] = tile_map.subsurface((x, y, tile_dim[0], tile_dim[1]))
             x += tile_dim[0]
         x = 0
