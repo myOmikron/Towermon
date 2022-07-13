@@ -1,6 +1,6 @@
 import math
 import pickle
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import numpy as np
 import pygame
@@ -190,15 +190,11 @@ class Level:
     health_bar: HealthBar
     game_over: bool
     ui: ButtonGrid
+    current_selection: Union[Tuple[int, int], None]
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
-        self.tiles = np.array([
-            image.load_png("grass.png"),
-            image.load_png("stone_grass.png"),
-            image.load_png("spawner.png"),
-            image.load_png("pokal.png")
-        ])
+        self.current_selection = None
         self.map = map
         self.target = map.target
         self.wave_done = False
@@ -235,10 +231,10 @@ class Level:
         self.timer = Timer(10, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
         self.coins = Wallet(screen)
 
-    def build_tower(self, tower: PokemonTower, position: Vector2):
-        if tower.cost >= self.coins:
-            self.coins -= tower.cost
-            self.map.towers[position.y, position.x] = tower
+    def build_tower(self, tower: PokemonTower, position: Tuple[int, int]):
+        if tower.cost >= self.coins.coins:
+            self.coins.coins -= tower.cost
+            self.map.towers[position[1], position[0]] = tower
 
     @staticmethod
     def _pixel_to_grid_coord(x: int, y: int, scale) -> Tuple[int, int]:
@@ -329,6 +325,7 @@ class Level:
                 fp.write("".join([f"{int(self.map_gird[y][x].tile_type)};{self.map_gird[y][x].surface_id} " for x in
                                   range(self.width)]) + "\n")
 
+
     def highlight(self, position: Tuple[int, int]):
         """
         Highlight or un highlight a tile on the map
@@ -339,7 +336,23 @@ class Level:
         if 0 <= x <= settings.SCREEN_WIDTH and 0 <= y <= settings.SCREEN_HEIGHT - settings.UI_HEIGHT:
             x, y = Level._pixel_to_grid_coord(x, y, self.scale)
             if x < self.map.width and y < self.map.height:
-                self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                if self.current_selection is not None:
+                    if self.current_selection == (x, y):
+                        self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                        self.current_selection = None
+                    else:
+                        self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted = False if self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted else True
+                        self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                        self.map._render_tile_from_grid(self.current_selection)
+                        self.current_selection = (x, y)
+                else:
+                    self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                    self.current_selection = (x, y)
+                if self.current_selection is not None and self.ui.current_selection is not None:
+                    # place tower
+                    self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                    self.current_selection = None
+                    self.build_tower(PokemonTower(json_parser.get_pokemon_list()[self.ui.current_selection]), (x, y))
                 self.map._render_tile_from_grid((x, y))
             return
         self.ui.click(position)
