@@ -25,6 +25,14 @@ class HealthBar:
     current_health_width: int
 
     def __init__(self, game_screen: SurfaceType, width: int, height: int, health: float, position: Tuple[int, int]):
+        """
+        A Simple and scalable health bar
+        :param game_screen: screen of the game
+        :param width: width of the health bar
+        :param height: height of the health bar
+        :param health: amount of health
+        :param position: position of the health bar on the game screen
+        """
         self.width = width
         self.height = height
         self.game_screen = game_screen
@@ -40,27 +48,37 @@ class HealthBar:
         self.current_health_bar = self.health_bar
 
     def _update_bar(self, amount):
-        self.local_x = int(self.local_x + ((abs(amount) / MAX_HEALTH) * self.width))
-        self.current_health_width = int(self.current_health_width - ((abs(amount) / MAX_HEALTH) * self.width))
+        self.local_x = round(self.local_x + ((abs(amount) / MAX_HEALTH) * self.width))
+        self.current_health_width = max(round(self.current_health_width - ((abs(amount) / MAX_HEALTH) * self.width)), 1)
         bar = pygame.surface.Surface((self.current_health_width, self.height))
         bar.fill((170, 15, 40))
         self.health_bar.fill((255, 255, 255))
         self.health_bar.blit(bar, (self.local_x, 0))
         self.current_health_bar = self.health_bar
+        return bar, self.local_x
 
     def update_health(self, amount):
+        """
+        Update the health bar
+        :param amount: amount of health that's getting removed
+        :return:
+        """
         if self.alive:
             self.health += amount
             if self.health <= 0:
                 self.alive = False
-                self._update_bar(amount)
-                return
-            self._update_bar(amount)
+                return self._update_bar(amount)
+            return self._update_bar(amount)
 
     def update(self, delta_time):
         ...
 
     def render(self, scale):
+        """
+        render health bar on the game screen
+        :param scale:
+        :return:
+        """
         x, y = self.position
         if self.scale != scale:
             self.scale = scale

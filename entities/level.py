@@ -1,5 +1,4 @@
 import math
-import pickle
 from typing import Tuple, List, Union
 
 import numpy as np
@@ -17,9 +16,10 @@ from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
 from entities.pokemon_tower import PokemonTower
-from entities.ui.button import ButtonGrid, Button, generate_button_image, generate_all_buttons
+from entities.ui.button import ButtonGrid, Button, generate_all_buttons
 from entities.ui.health_bar import HealthBar
-from entities.wallet import Wallet
+from entities.ui.hud import HUD
+from entities.ui.wallet import Wallet
 from utils import image
 from json_utils import json_parser
 from random import choice
@@ -183,7 +183,7 @@ class Level:
     target: Vector2
     map: Map
     timer: Timer
-    coins: Wallet
+    wallet: Wallet
     wave_done: bool
     spawn_frequenz: float = 1
     stage: int = 0
@@ -202,7 +202,8 @@ class Level:
 
         buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
 
-        self.health_bar = HealthBar(game_screen, 200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
+        # self.health_bar = HealthBar(200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
+        self.hud = HUD(game_screen, (settings.SCREEN_WIDTH - 448, 10))
 
         self.ui = ButtonGrid(settings.SCREEN_WIDTH, settings.UI_HEIGHT,
                              (0, settings.SCREEN_HEIGHT - settings.UI_HEIGHT), buttons, game_screen)
@@ -219,7 +220,7 @@ class Level:
             path=path,
             position=spawn,
             factory=enemy_factory,
-            last_delta=0, health_callback=self.health_bar.update_health)
+            last_delta=0, health_callback=self.hud.update_health)
             for spawn, path in zip(map.spawns, paths)]
 
     def start(self, screen):
@@ -229,11 +230,12 @@ class Level:
         :return:
         """
         self.timer = Timer(10, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
-        self.coins = Wallet(screen)
+        self.wallet = Wallet(screen)
 
     def build_tower(self, tower: PokemonTower, position: Tuple[int, int]):
-        if tower.cost >= self.coins.coins:
-            self.coins.coins -= tower.cost
+        if tower.cost >= self.wallet.coins:
+            self.wallet.coins -= tower.cost
+            self.hud.update_coins(self.wallet.coins)
             self.map.towers[position[1], position[0]] = tower
 
     @staticmethod
@@ -410,6 +412,6 @@ class Level:
         for spawner in self.spawners:
             spawner.render(scale)
         self.timer.render(scale)
-        self.coins.render()
-        self.health_bar.render(1)
+        #self.health_bar.render(1)
+        self.hud.render(1)
         self.ui.render()
