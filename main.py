@@ -209,6 +209,9 @@ class App:
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing
+            pygame.mixer.music.unload()
+            pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
+            pygame.mixer.music.play(1, 0, 0)
 
 
 if __name__ == '__main__':
