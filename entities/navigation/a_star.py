@@ -52,7 +52,8 @@ class AStar:
                 if tentative_g_score < self.g_score[neighbor.position]:
                     self.came_from[neighbor.position] = current
                     self.g_score[neighbor.position] = tentative_g_score
-                    self.f_score[neighbor.position] = tentative_g_score + self.cost_to_gol(neighbor.position, end) + neighbor.travel_cost
+                    self.f_score[neighbor.position] = tentative_g_score + self.cost_to_gol(neighbor.position,
+                                                                                           end) + neighbor.travel_cost
                     if neighbor not in self.visited:
                         self.open_set.put(PrioritizedItem(self.f_score[neighbor.position], neighbor.position))
                         self.visited.add(neighbor)

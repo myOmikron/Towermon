@@ -8,7 +8,7 @@ from . import jit_cmp
 number = Union[int, float]
 
 
-@dataclass()
+@dataclass
 class Vector2:
     _data: np.array = field(init=False, default_factory=lambda: np.zeros([0, 0]))
 
@@ -121,4 +121,4 @@ class Vector2:
         return self._equals(other)
 
     def __repr__(self):
-        return f"{self.x, self.y}"
+        return f"Vector2({self.x, self.y})"

@@ -14,7 +14,7 @@ class PokemonTower:
         self.level = 1
         self.range = 10
         self.rate = 2
-        self.cost = 1
+        self.cost = 100
 
     # Stufenweise Verbesserung durch Münzen
     def train(self):

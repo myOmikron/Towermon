@@ -23,7 +23,7 @@ class Tile(Cell):
         passable = True
         if tile_type == TileType.BLOCKED or tile_type == TileType.TURRET:
             passable = False
-        Cell.__init__(self, position=position, visited=False, travel_cost=score, passable=passable)
+        Cell.__init__(self, position=position, travel_cost=score, passable=passable)
         self.tile_type = tile_type
         self.surface_id = surface_id
         self.highlighted = False

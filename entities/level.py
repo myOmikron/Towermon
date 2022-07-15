@@ -1,4 +1,5 @@
 import math
+import random
 from typing import Tuple, List, Union
 
 import numpy as np
@@ -22,7 +23,17 @@ from entities.ui.hud import HUD
 from entities.ui.wallet import Wallet
 from utils import image
 from json_utils import json_parser
-from random import choice
+
+
+def generate_map(name, width, height):
+    with open(name, "w") as fp:
+        for h in range(height):
+            for w in range(width):
+                if random.random() >= 0.5:
+                    fp.write(" 1;1")
+                else:
+                    fp.write(" 0;0")
+            fp.write("\n")
 
 
 class Map:
@@ -51,16 +62,6 @@ class Map:
         self.spawns = spawns
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
-
-        # TODO remove sample towers!
-        i = 0
-        while i < 5:
-            list = [12, 3, 4, 5, 6, 7, 8, 9, 14, 1, 13, 25]
-            x = choice(list)
-            y = choice(list)
-            pokemon = choice(json_parser.get_pokemon_list())
-            self.towers[y][x] = PokemonTower(pokemon)
-            i += 1
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -191,6 +192,8 @@ class Level:
     game_over: bool
     ui: ButtonGrid
     current_selection: Union[Tuple[int, int], None]
+    game_screen: SurfaceType
+    nav_mesh: NavMesh
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
@@ -199,6 +202,7 @@ class Level:
         self.target = map.target
         self.wave_done = False
         self.game_over = False
+        self.game_screen = game_screen
 
         buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
 
@@ -209,9 +213,9 @@ class Level:
                              (0, settings.SCREEN_HEIGHT - settings.UI_HEIGHT), buttons, game_screen)
 
         enemy_factory = EnemyFactory(1)
-        nav_mesh = NavMesh(width, height, map.grid)
+        self.nav_mesh = NavMesh(width, height, map.grid)
 
-        paths = [nav_mesh.find_path(spawn, map.target, AStar) for spawn in map.spawns]
+        paths = [self.nav_mesh.find_path(spawn, map.target, AStar) for spawn in map.spawns]
 
         self.spawners = [EnemySpawner(
             dead=[],
@@ -229,14 +233,49 @@ class Level:
         :param screen: game screen
         :return:
         """
-        self.timer = Timer(10, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
-        self.wallet = Wallet(screen)
+        self.timer = Timer(settings.TIMER, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
+        self.wallet = Wallet(50000, screen)
+        self.hud.update_coins(self.wallet.coins)
+
+    def render_path(self, path, scale):
+        """
+        Render a path from a spawner for debug only
+        :param path:
+        :param scale:
+        :return:
+        """
+        pygame.draw.lines(self.game_screen, (0, 0, 0), False,
+                          [(int(cell.x * settings.TILE_SIZE * scale), int(cell.y * settings.TILE_SIZE * scale)) for cell
+                           in path])
+
+    def _check_path(self, position: Tuple[int, int]):
+        """
+        check if the current position is intersecting with a path, if there is an intersection, we try to calculate a
+        new path, if there is a new possible path you can build there
+        :param position:
+        :return:
+        """
+        for spawner in self.spawners:
+            if position in [(c.x, c.y) for c in spawner.path]:
+                self.map.grid[position[1]][position[0]].passable = False
+                new_path = self.nav_mesh.find_path(spawner.position, self.target, AStar, recalculate=True)
+                self.map.grid[position[1]][position[0]].passable = True
+                if new_path is None:
+                    return False
+                else:
+                    spawner.path = new_path
+        return True
 
     def build_tower(self, tower: PokemonTower, position: Tuple[int, int]):
-        if tower.cost >= self.wallet.coins:
-            self.wallet.coins -= tower.cost
-            self.hud.update_coins(self.wallet.coins)
-            self.map.towers[position[1], position[0]] = tower
+        x, y = position
+        if tower.cost <= self.wallet.coins and not self.timer.finished and self.map.grid[y][
+            x].tile_type != TileType.BLOCKED:
+            if self._check_path(position):
+                self.wallet.coins -= tower.cost
+                self.hud.update_coins(self.wallet.coins)
+                self.map.towers[position[1], position[0]] = tower
+                self.map.grid[y][x].tile_type = TileType.TURRET
+                self.map.grid[y][x].passable = False
 
     @staticmethod
     def _pixel_to_grid_coord(x: int, y: int, scale) -> Tuple[int, int]:
@@ -292,7 +331,6 @@ class Level:
                         row.append(Tile(surface_id, position, tile_type))
                 grid.append(np.array(row))
         grid = np.array(grid)
-
         tiles = np.array([
             image.load_png("grass.png"),
             image.load_png("stone_grass.png"),
@@ -327,7 +365,6 @@ class Level:
                 fp.write("".join([f"{int(self.map_gird[y][x].tile_type)};{self.map_gird[y][x].surface_id} " for x in
                                   range(self.width)]) + "\n")
 
-
     def highlight(self, position: Tuple[int, int]):
         """
         Highlight or un highlight a tile on the map
@@ -343,7 +380,8 @@ class Level:
                         self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
                         self.current_selection = None
                     else:
-                        self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted = False if self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted else True
+                        self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted = False if \
+                            self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted else True
                         self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
                         self.map._render_tile_from_grid(self.current_selection)
                         self.current_selection = (x, y)
@@ -395,7 +433,7 @@ class Level:
 
         if self.wave_done and self.timer.finished:
             self.timer.finished = False
-            self.timer.duration = 10
+            self.timer.duration = settings.TIMER
 
         self.map.update(delta_time)
         for spawner in self.spawners:
@@ -411,7 +449,8 @@ class Level:
         self.map.render(scale)
         for spawner in self.spawners:
             spawner.render(scale)
+            # self.render_path(spawner.path, scale)
         self.timer.render(scale)
-        #self.health_bar.render(1)
+        # self.health_bar.render(1)
         self.hud.render(1)
         self.ui.render()

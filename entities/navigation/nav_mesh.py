@@ -10,12 +10,11 @@ from .Math.vector2 import Vector2
 @dataclass(slots=True)
 class Cell:
     position: Vector2
-    visited: bool
     travel_cost: int
     passable: bool
 
     def __hash__(self):
-        return hash(self.position)
+        return hash((self.position.x, self.position.y))
 
 
 @dataclass(order=True, slots=True)
@@ -41,8 +40,9 @@ class NavMesh:
         for x_off, y_off in settings.NEIGHBOURS:
             nx = x + x_off
             ny = y + y_off
+            assert (x == nx and y != ny) or (x != nx and y == ny)
             if 0 <= nx < self.width and 0 <= ny < self.height:
-                if (cell := self.grid[int(ny)][int(nx)]).passable:
+                if (cell := self.grid[round(ny)][round(nx)]).passable:
                     yield cell
 
     def print_grid(self):
@@ -61,7 +61,6 @@ class NavMesh:
         """
         if not recalculate:
             if (path := self.paths.get((start, end))) is not None:
-                print("Found Path in cache")
                 return path
 
         def d(p1: Vector2, p2: Vector2) -> float:

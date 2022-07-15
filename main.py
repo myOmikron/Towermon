@@ -16,7 +16,7 @@ class Game:
     font: Font
     playing: bool
     screen: SurfaceType
-    test: Test
+    # test: Test
 
     def __init__(self, screen: SurfaceType):
         # Set Keys on default for menu actions
@@ -30,11 +30,11 @@ class Game:
         self.screen.fill((0, 0, 0))
 
         self.scale = 1
-        self.level = Level.load_level("sample_level.dat")
+        self.level = Level.load_level("level_0.dat")
         self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
-        if settings.DEBUG:
-            self.test = Test(self.scale, self.level.map.grid)
+        #if settings.DEBUG:
+        #    self.test = Test(self.scale, self.level.map.grid)
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
@@ -71,21 +71,21 @@ class Game:
                         move_west = event.type == pygame.KEYDOWN
                     if event.key == pygame.K_s:
                         move_south = event.type == pygame.KEYDOWN
-                    #if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
+                    # if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
                     #    self.level.level_spawn()
-                    if settings.DEBUG:
-                        if event.key == pygame.K_q:
-                            if event.type == pygame.KEYDOWN:
-                                self.test.set_start(*pygame.mouse.get_pos(), scale=self.scale)
-                        if event.key == pygame.K_e:
-                            if event.type == pygame.KEYDOWN:
-                                self.test.set_end(*pygame.mouse.get_pos(), scale=self.scale)
-                        if event.key == pygame.K_r:
-                            if event.type == pygame.KEYDOWN:
-                                self.test.search()
-                        if event.key == pygame.K_t:
-                            if event.type == pygame.KEYDOWN:
-                                self.test.spawn()
+                    #if settings.DEBUG:
+                    #    if event.key == pygame.K_q:
+                    #        if event.type == pygame.KEYDOWN:
+                    #            self.test.set_start(*pygame.mouse.get_pos(), scale=self.scale)
+                    #    if event.key == pygame.K_e:
+                    #        if event.type == pygame.KEYDOWN:
+                    #            self.test.set_end(*pygame.mouse.get_pos(), scale=self.scale)
+                    #    if event.key == pygame.K_r:
+                    #        if event.type == pygame.KEYDOWN:
+                    #            self.test.search()
+                    #    if event.key == pygame.K_t:
+                    #        if event.type == pygame.KEYDOWN:
+                    #            self.test.spawn()
 
             # Move player
             if move_east:
@@ -104,15 +104,15 @@ class Game:
             if self.level.game_over:
                 self.playing = False
 
-            if settings.DEBUG:
-                self.test.update(time_delta)
+            #if settings.DEBUG:
+            #    self.test.update(time_delta)
             self.level.update(time_delta)
 
             # Render map
             self.level.render(self.scale)
 
-            if settings.DEBUG:
-                self.test.render(self.scale)
+            #if settings.DEBUG:
+            #    self.test.render(self.scale)
 
             # Render player
             self.player.render(time_delta, self.scale)
@@ -204,7 +204,7 @@ class App:
             self.menu.display_menu()
             if self.playing:
                 pygame.mixer.music.load('assets/audio/Route 1.wav')
-                pygame.mixer.music.play(-1,0,0)
+                pygame.mixer.music.play(-1, 0, 0)
                 self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()

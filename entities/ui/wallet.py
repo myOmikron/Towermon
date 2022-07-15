@@ -6,8 +6,8 @@ from utils import image
 class Wallet:
     coins: int
 
-    def __init__(self, screen: SurfaceType):
-        self.coins = 0
+    def __init__(self, coins: int, screen: SurfaceType):
+        self.coins = coins
         self.font = pygame.font.SysFont("Arial", 50, bold=True)
         self.screen = screen
 
