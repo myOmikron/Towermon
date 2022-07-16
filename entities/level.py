@@ -23,7 +23,7 @@ from entities.ui.hud import HUD
 from entities.ui.wallet import Wallet
 from utils import image
 from json_utils import json_parser
-
+from entities.pokemon_tower import PokemonTower, Projectile
 
 def generate_map(name, width, height):
     with open(name, "w") as fp:
@@ -203,6 +203,7 @@ class Level:
     current_selection: Union[Tuple[int, int], None]
     game_screen: SurfaceType
     nav_mesh: NavMesh
+    bullets: [Projectile]
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
@@ -212,6 +213,7 @@ class Level:
         self.wave_done = False
         self.game_over = False
         self.game_screen = game_screen
+        self.bullets = []
 
         buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
 
@@ -455,7 +457,17 @@ class Level:
                     self.render_attack(pokemon)
                 for spawner in self.spawners:
                     for enemy in spawner.on_the_way:
-                        pokemon.attack(enemy)
+                        enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
+                        if pokemon.attack(enemy) == True:
+                            pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
+                            bullet = Projectile(pos, enemy_pos)
+                            self.bullets.append(bullet)
+        for bullet in self.bullets:
+            if len(bullet.path) > 0:
+                bullet.move()
+                bullet.render(self.game_screen)
+            else: self.bullets.remove(bullet)
+
         self.timer.update(delta_time)
 
     def render(self, scale: float) -> None:
