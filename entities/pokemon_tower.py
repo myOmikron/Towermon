@@ -44,7 +44,6 @@ class PokemonTower:
                 factor = parser.get_damage_factor(self.type, enemy.type)
                 damage = self.level * factor
                 enemy.take_life(damage)
-                print(enemy.life)
                 attack_sound.play()
             else:
                 self.active = False
