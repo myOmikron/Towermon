@@ -49,6 +49,7 @@ def load_tile_map(name: str, tile_dim: Tuple[int, int]) -> NDArray[NDArray[pygam
     return array
 
 
+
 if __name__ == "__main__":
     pygame.mixer.pre_init(44100, 16, 2, 4096)
     # Game init

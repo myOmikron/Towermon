@@ -10,10 +10,12 @@ LEVEL_HEIGHT = 500
 LEVEL_WIDTH = 500
 NEIGHBOURS = [(0, 1), (1, 0), (-1, 0), (0, -1)]  # (-1, 1), (1, -1), (1, 1), (-1, -1)
 
-ENEMY_LIFE = 1
+ENEMY_LIFE = 20
 DEBUG = False
 
 TIMER = 30
+
+COINS = 5000
 
 MAP_TYPE_TO_INDEX = {
     "normal": 0,

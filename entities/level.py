@@ -48,6 +48,7 @@ class Map:
     spawns: List[Vector2]
     target: Vector2
     high_light: Surface
+    pokemon_imgs: dict
     """Map for the Level"""
 
     def __init__(self, width, height, game_screen, grid, tiles, spawns, target):
@@ -62,6 +63,7 @@ class Map:
         self.spawns = spawns
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
+        self.pokemon_imgs = self.load_imgs()
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -73,9 +75,17 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile_from_grid((int(position.x), int(position.y)))
 
+
+    @staticmethod
+    def load_imgs():
+        img_dict = dict()
+        for pokemon in json_parser.get_pokemon_list():
+            img_dict[pokemon] = utils.image.load_png(pokemon+'.png')
+        return img_dict
+
     def _render_tower(self, position: Tuple[int, int]):
         tower = self.towers[position]
-        img = tower.get_image()
+        img = self.pokemon_imgs[tower.name]
         self._render_tile(img, position)
         if tower.is_active():
             #TODO remove if Tower is not active?
@@ -236,8 +246,9 @@ class Level:
         :return:
         """
         self.timer = Timer(settings.TIMER, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
-        self.wallet = Wallet(50000, screen)
+        self.wallet = Wallet(settings.COINS, screen)
         self.hud.update_coins(self.wallet.coins)
+
 
     def render_path(self, path, scale):
         """
