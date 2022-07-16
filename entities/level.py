@@ -43,7 +43,7 @@ class Map:
     game_screen: SurfaceType
     map_screen: Surface
     grid: NDArray[NDArray[Tile]]
-    towers: NDArray[NDArray[PokemonTower]]
+    towers: dict
     tiles: NDArray[Surface]
     spawns: List[Vector2]
     target: Vector2
@@ -57,7 +57,7 @@ class Map:
         self.game_screen = game_screen
         self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT - settings.UI_HEIGHT))
         self.grid = grid
-        self.towers = np.ndarray(shape=grid.shape, dtype=PokemonTower)
+        self.towers = dict()
         self.tiles = tiles
         self.spawns = spawns
         self.target = target
@@ -74,16 +74,18 @@ class Map:
         self._render_tile_from_grid((int(position.x), int(position.y)))
 
     def _render_tower(self, position: Tuple[int, int]):
-        x, y = position
-        tower = self.towers[y][x]
+        tower = self.towers[position]
         img = tower.get_image()
         self._render_tile(img, position)
+        if tower.is_active():
+            #TODO remove if Tower is not active?
+            self._render_tile(self.high_light, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int]):
         x, y = position
         tile = self.grid[y][x]
         self._render_tile(self.tiles[tile.surface_id], position)
-        if self.towers[y][x]:
+        if position in self.towers.keys():
             self._render_tower((x, y))
         if tile.highlighted:
             self._render_tile(self.high_light, position)
@@ -131,7 +133,7 @@ class Map:
                 for x in range(0, num_x + 2):
                     if y < self.height and x < self.width:
                         self._render_tile_from_grid((x, y))
-                        if self.towers[y][x]:
+                        if (x, y) in self.towers.keys():
                             self._render_tower((x, y))
 
     def update(self, delta_time: float) -> None:
@@ -273,7 +275,7 @@ class Level:
             if self._check_path(position):
                 self.wallet.coins -= tower.cost
                 self.hud.update_coins(self.wallet.coins)
-                self.map.towers[position[1], position[0]] = tower
+                self.map.towers[position] = tower
                 self.map.grid[y][x].tile_type = TileType.TURRET
                 self.map.grid[y][x].passable = False
 
@@ -388,11 +390,12 @@ class Level:
                 else:
                     self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
                     self.current_selection = (x, y)
-                if self.current_selection is not None and self.ui.current_selection is not None:
+                if self.current_selection is not None and self\
+                        .ui.current_selection is not None:
                     # place tower
                     self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
                     self.current_selection = None
-                    self.build_tower(PokemonTower(json_parser.get_pokemon_list()[self.ui.current_selection]), (x, y))
+                    self.build_tower(PokemonTower(json_parser.get_pokemon_list()[self.ui.current_selection],x,y), (x, y))
                 self.map._render_tile_from_grid((x, y))
             return
         self.ui.click(position)
@@ -439,6 +442,11 @@ class Level:
         for spawner in self.spawners:
             spawner.update_spawn(delta_time, self.spawn_frequenz)
             spawner.update(delta_time)
+        for y in self.map.towers:
+            for pokemon in self.map.towers.values():
+                    for spawner in self.spawners:
+                        for enemy in spawner.on_the_way:
+                            pokemon.attack(enemy)
         self.timer.update(delta_time)
 
     def render(self, scale: float) -> None:

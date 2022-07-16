@@ -94,7 +94,7 @@ class Enemy(Entity, AnimatedSprite):
         self.angle = 0
         self.life = settings.ENEMY_LIFE
 
-    def take_life(self, damage: int):
+    def take_life(self, damage: float):
         self.life = self.life - damage
 
     def update(self, delta_time: float) -> None:
