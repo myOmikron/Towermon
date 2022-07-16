@@ -87,9 +87,6 @@ class Map:
         tower = self.towers[position]
         img = self.pokemon_imgs[tower.name]
         self._render_tile(img, position)
-        if tower.is_active():
-            #TODO remove if Tower is not active?
-            self._render_tile(self.high_light, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int]):
         x, y = position
@@ -453,11 +450,12 @@ class Level:
         for spawner in self.spawners:
             spawner.update_spawn(delta_time, self.spawn_frequenz)
             spawner.update(delta_time)
-        for y in self.map.towers:
             for pokemon in self.map.towers.values():
-                    for spawner in self.spawners:
-                        for enemy in spawner.on_the_way:
-                            pokemon.attack(enemy)
+                if pokemon.is_active():
+                    self.render_attack(pokemon)
+                for spawner in self.spawners:
+                    for enemy in spawner.on_the_way:
+                        pokemon.attack(enemy)
         self.timer.update(delta_time)
 
     def render(self, scale: float) -> None:
@@ -473,3 +471,12 @@ class Level:
         # self.health_bar.render(1)
         self.hud.render(1)
         self.ui.render()
+
+    def render_attack(self, pokemon: PokemonTower):
+        pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
+        pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
+        pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
+        side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
+        rect = pygame.Rect(pos_x,pos_y, side ,side)
+        pygame.draw.rect(self.game_screen,pygame.Color(255,0,0,1), rect, width=3)
+        pygame.display.update()
