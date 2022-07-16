@@ -10,6 +10,9 @@ pokedex_dict = json.load(pokedex_path.open())
 type_path = Path('data/typesystem.json')
 type_dict = json.load(type_path.open())
 
+mode_path = Path('data/gamemode.json')
+mode_dict = json.load(mode_path.open())
+
 
 # JSON File zu Python Dictionary Parsen
 def parse_pokemon(json_dict: dict) -> Dict:
@@ -43,3 +46,10 @@ def get_pokemon_list() -> List[str]:
 
 def get_damage_factor(attack: str, enemy_type: str) -> float:
     return type_dict[attack][enemy_type]
+
+def get_game_settings(mode: str) -> dict:
+    settings = dict()
+    settings["coins"] = mode_dict[mode]["coins"]
+    settings["timer"] = mode_dict[mode]["timer"]
+    settings["enemy_life"] = mode_dict[mode]["enemy_life"]
+    return settings

@@ -1,0 +1,22 @@
+{
+  "easy": {
+    "coins": 5000,
+    "timer": 30,
+    "enemy_life": 20
+  },
+  "medium": {
+    "coins": 3000,
+    "timer": 25,
+    "enemy_life": 25
+  },
+  "hard": {
+    "coins": 1500,
+    "timer": 15,
+    "enemy_life": 30
+  },
+  "insane": {
+    "coins": 750,
+    "timer": 5,
+    "enemy_life": 40
+  }
+}

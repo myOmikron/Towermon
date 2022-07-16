@@ -1,7 +1,12 @@
 import sys
-import pygame
+import pygame as pg
 from pygame.font import Font
-from pygame.surface import SurfaceType
+import pygame_widgets
+from pygame_widgets.button import Button
+from pygame_widgets.dropdown import Dropdown
+
+import json_utils.json_parser
+import settings
 
 
 class Menu:
@@ -11,14 +16,14 @@ class Menu:
         self.show_display = True
 
         """ Get mid width and mid height position of the current game-window """
-        self.x, self.y = pygame.display.get_window_size()
+        self.x, self.y = pg.display.get_window_size()
         self.mid_w, self.mid_h = self.x / 2, self.y / 2
         """ create cursor rectangle """
-        self.cursor_rect = pygame.Rect(0, 0, 20, 20)
+        self.cursor_rect = pg.Rect(0, 0, 20, 20)
         """ offset for the cursor, that it is next to Menu Options"""
         self.offset = - 100
-        self.font = pygame.font.Font("assets/Font/Gameplay.ttf", 20)
-        self.font_big = pygame.font.Font("assets/Font/Gameplay.ttf", 40)
+        self.font = pg.font.Font("assets/Font/Gameplay.ttf", 20)
+        self.font_big = pg.font.Font("assets/Font/Gameplay.ttf", 40)
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -31,12 +36,21 @@ class Menu:
 
     def blit_(self):
         self.app.screen.blit(self.app.screen, (0, 0))
-        pygame.display.update()
+        pg.display.update()
         self.app.reset_keys()
 
     def display_menu(self):
         ...
 
+    def create_dropdown(self) -> Dropdown:
+        screen = self.app.screen
+        x = self.mid_w - 50
+        y = self.mid_h + 130
+        width = 100
+        height = 50
+        choices = ["easy", "medium", "hard", "insane"]
+        dropdown = Dropdown(screen,x,y,width,height,'Select Diffculty', choices, borderRadius=3, colour=pg.Color('grey'),  direction='down', textHAlign='left')
+        return dropdown
 
 class MainMenu(Menu):
 
@@ -48,19 +62,24 @@ class MainMenu(Menu):
         self.optionsx, self.optionsy = self.mid_w, self.mid_h + 70
         self.creditsx, self.creditsy = self.mid_w, self.mid_h + 100
         self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
+        self.dropdown = self.create_dropdown()
+        self.error = ""
 
     def display_menu(self):
         self.show_display = True
         while self.show_display:
-            self.app.check_events()
+            events = self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
+            if self.error != "":
+                self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Start Game', self.startx, self.starty)
             self.draw_text(self.font, 'Exit Game', self.exitx, self.exity)
             self.draw_text(self.font, 'Options', self.optionsx, self.optionsy)
             self.draw_text(self.font, 'Credits', self.creditsx, self.creditsy)
             self.draw_cursor()
+            pygame_widgets.update(events)
             self.blit_()
 
     def move_cursor(self):
@@ -96,16 +115,26 @@ class MainMenu(Menu):
         self.move_cursor()
         if self.app.START_KEY:
             if self.state == 'Start':
-                self.app.playing = True
+                    difficulty = self.dropdown.getSelected()
+                    if difficulty != None:
+                        self.set_diffictuly(difficulty)
+                        self.app.playing = True
+                    else: self.error = "Please select difficulty before starting the game!"
             elif self.state == 'Options':
                 self.app.menu = self.app.options
             elif self.state == 'Exit':
-                pygame.quit()
+                pg.quit()
                 sys.exit()
             elif self.state == 'Credits':
                 self.app.menu = self.app.credits
             self.show_display = False
 
+    @staticmethod
+    def set_diffictuly(difficulty: str):
+        dict = json_utils.json_parser.get_game_settings(difficulty)
+        settings.COINS = dict["coins"]
+        settings.TIMER = dict["timer"]
+        settings.ENEMY_LIFE = dict["enemy_life"]
 
 class OptionsMenu(Menu):
 
@@ -153,7 +182,7 @@ class VolumeMenu(Menu):
     def __init__(self, game):
         Menu.__init__(self, game)
         self.state = 'vol_up'
-        self.volume = pygame.mixer.music.get_volume()
+        self.volume = pg.mixer.music.get_volume()
         self.message = 'Use the Up and Down keys to change the volume!'
 
 
@@ -174,7 +203,7 @@ class VolumeMenu(Menu):
             self.show_display = False
         elif self.app.UP_KEY: self.volume += 0.1
         elif self.app.DOWN_KEY: self.volume -= 0.1
-        pygame.mixer.music.set_volume(self.volume)
+        pg.mixer.music.set_volume(self.volume)
 
 
 class ControlsMenu(Menu):
@@ -218,3 +247,6 @@ class CreditsMenu(Menu):
             self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 90)
             self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 110)
             self.blit_()
+
+
+

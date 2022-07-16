@@ -15,10 +15,10 @@ class Game:
     player: Player
     font: Font
     playing: bool
-    screen: SurfaceType
+    screen: pg.SurfaceType
     # test: Test
 
-    def __init__(self, screen: SurfaceType):
+    def __init__(self, screen: pg.SurfaceType):
         # Set Keys on default for menu actions
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
         self.clock = pygame.time.Clock()
@@ -125,7 +125,7 @@ class Game:
 
 
 class App:
-    screen: SurfaceType
+    screen: pg.SurfaceType
     menu: Menu
     main_menu: Menu
     options_menu: Menu
