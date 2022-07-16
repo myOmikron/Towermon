@@ -63,12 +63,13 @@ class PokemonTower:
         return self.active
 
 class Projectile():
-    def __init__(self, pos, enemy_pos):
+    def __init__(self, pos, enemy_pos, enemy):
         self.pos = pos
         self.goal = enemy_pos
         self.radius = 3
         self.color = pygame.Color(255,0,0)
         self.path = self.calculate_points()
+        self.enemy = enemy
 
     def calculate_points(self):
         points = []
@@ -78,11 +79,12 @@ class Projectile():
         goal_y = self.goal[1]
         delta_x = goal_x -x
         delta_y = goal_y - y
-        interval_x = delta_x / 50
-        interval_y = delta_y / 50
+        interval_x = delta_x / 30
+        interval_y = delta_y / 30
         i = 0
-        while i <= 50:
-            points.append((x + interval_x * i, y + interval_y * i))
+        while i <= 30:
+            point = (round(x + interval_x * i), round(y + interval_y * i))
+            points.append(point)
             i+=1
         return points
 
@@ -90,6 +92,7 @@ class Projectile():
         if len(self.path) > 0:
             self.pos = self.path[0]
             self.path.pop(0)
+
 
     def render(self, surface: Surface):
         pygame.draw.circle(surface, self.color, self.pos, self.radius)

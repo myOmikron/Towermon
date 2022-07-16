@@ -460,7 +460,7 @@ class Level:
                         enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                         if pokemon.attack(enemy) == True:
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
-                            bullet = Projectile(pos, enemy_pos)
+                            bullet = Projectile(pos, enemy_pos, enemy)
                             self.bullets.append(bullet)
         for bullet in self.bullets:
             if len(bullet.path) > 0:
@@ -486,9 +486,12 @@ class Level:
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
-        pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
-        pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
-        side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
+        #pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
+        #pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
+        #side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
+        pos_x = pixel_pos[0]-1
+        pos_y = pixel_pos[1]-1
+        side = self.scale * settings.TILE_SIZE +2
         rect = pygame.Rect(pos_x,pos_y, side ,side)
         pygame.draw.rect(self.game_screen,pygame.Color(255,0,0,1), rect, width=3)
         pygame.display.update()

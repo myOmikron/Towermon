@@ -21,7 +21,7 @@ class Entity:
     position: Vector2 = None
     direction: Vector2 = None
     goal: Vector2 = None
-    speed: float = 2
+    speed: float = 1
     at_goal: bool = False
 
     """
