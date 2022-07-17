@@ -38,7 +38,7 @@ class PokemonTower:
         attack_sound = pygame.mixer.Sound('assets/audio/click.wav')
         current_time = time.time_ns()
         if abs(current_time - self.last_attack) > (1 / self.rate) * 1000000000:
-            if self.in_range(enemy):
+            if self.in_range(enemy) and enemy.life > 0:
                 self.active = True
                 self.last_attack = time.time_ns()
                 factor = parser.get_damage_factor(self.type, enemy.type)

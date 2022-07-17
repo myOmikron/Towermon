@@ -457,11 +457,17 @@ class Level:
                 pokemon.deactivate()
                 for spawner in self.spawners:
                     for enemy in spawner.on_the_way:
-                        enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                         if pokemon.attack(enemy) == True:
+                            # Get Pixel coordinates
+                            enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
+                            # create Projectile
                             bullet = Projectile(pos, enemy_pos, enemy)
                             self.bullets.append(bullet)
+                            # calculate coins
+                            if enemy.life <= 0:
+                                self.wallet.coins += 50
+                                print(enemy.type +str(enemy.life))
         self.timer.update(delta_time)
 
     def render(self, scale: float) -> None:
@@ -479,6 +485,7 @@ class Level:
             # self.render_path(spawner.path, scale)
         self.timer.render(scale)
         # self.health_bar.render(1)
+        self.hud.update_coins(self.wallet.coins)
         self.hud.render(1)
         self.ui.render()
 

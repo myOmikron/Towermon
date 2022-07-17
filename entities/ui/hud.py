@@ -14,8 +14,8 @@ class HUD:
     back_ground: Surface
     position: Tuple[int, int]
     game_screen: SurfaceType
-    coins: int
     font: Font
+    coins: int
 
     def __init__(self, game_screen: SurfaceType, position: Tuple[int, int]):
         """
@@ -60,5 +60,5 @@ class HUD:
         self.coins = amount
         self._draw()
 
-    def render(self, scale):
+    def render(self, coins: int):
         self.game_screen.blit(self.ui_screen, self.position)
