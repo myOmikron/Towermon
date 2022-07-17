@@ -91,6 +91,8 @@ class Map:
 
     def _render_tile_from_grid(self, position: Tuple[int, int], offset: Tuple[int, int]):
         x, y = position
+        if self.width <= x + offset[0] or self.height <= y + offset[1]:
+            return
         tile = self.grid[y + offset[1]][x + offset[0]]
         self._render_tile(self.tiles[tile.surface_id], position)
         if position in self.towers.keys():

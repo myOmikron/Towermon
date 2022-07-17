@@ -130,13 +130,15 @@ class Game:
                         new_x = offset[0] + 1
                         if new_x > self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE):
                             new_x = self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE)
-                        offset = new_x, offset[1]
+                        if new_x < 0:
+                            new_x = 0
+                        offset = int(new_x), offset[1]
                         counter = time.time_ns() + 100_000_000
                 elif move_west:
                     new_x = offset[0] - 1
                     if new_x < 0:
                         new_x = 0
-                    offset = new_x, offset[1]
+                    offset = int(new_x), offset[1]
                     counter = time.time_ns() + 100_000_000
                 if move_north:
                     # Only move if the opposite direction is not pressed
@@ -144,13 +146,15 @@ class Game:
                         new_y = offset[1] - 1
                         if new_y < 0:
                             new_y = 0
-                        offset = offset[0], new_y
+                        offset = offset[0], int(new_y)
                         counter = time.time_ns() + 100_000_000
                 elif move_south:
                     new_y = offset[1] + 1
                     if new_y > self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE):
                         new_y = self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE)
-                    offset = offset[0], new_y
+                    if new_y < 0:
+                        new_y = 0
+                    offset = offset[0], int(new_y)
                     counter = time.time_ns() + 100_000_000
 
             if self.level.game_over:
