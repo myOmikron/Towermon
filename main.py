@@ -2,6 +2,7 @@ import pygame
 from pygame.mixer import Sound
 
 import settings
+import utils.image
 from entities.Test import Test
 from entities.level import Level
 from entities.player import Player
@@ -185,6 +186,7 @@ class App:
 
         # Set fullscreen && double buffering for performance improvement
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
+
         pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
         pygame.mixer.music.play(1, 0, 0)

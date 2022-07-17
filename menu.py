@@ -3,9 +3,7 @@ import sys
 import pygame
 import pygame as pg
 from pygame.font import Font
-import pygame_widgets
-from pygame_widgets.button import Button
-from pygame_widgets.dropdown import Dropdown
+from utils import image
 
 import json_utils.json_parser
 import settings
@@ -74,10 +72,17 @@ class MainMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
+        pos_x, pos_y = self.app.screen.get_size()
+        pos_x = pos_x - 340
+        pos_y = pos_y - 250
+        pokeball = Pokeball(pos_x,pos_y)
         while self.show_display:
             self.app.check_events()
             self.check_input()
-            self.app.screen.fill((0, 0, 0))
+            self.draw_background()
+            pokeball.render_ball(self.app.screen)
+            pokeball.move()
+
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
@@ -89,6 +94,31 @@ class MainMenu(Menu):
             self.draw_cursor()
             #pygame_widgets.update(events)
             self.blit_()
+
+    def draw_background(self):
+        # Create gradient background
+        bg_picture = image.load_png('gradient.png')
+        bg_picture = pygame.transform.scale(bg_picture, self.app.screen.get_size())
+        self.app.screen.blit(bg_picture, (0, 0))
+
+        #get screen_size for positions
+        pos_x, pos_y = self.app.screen.get_size()
+
+        #draw Ellipse with Border
+        pos_x =  pos_x - 450
+        pos_y = pos_y - 200
+        ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
+        pygame.draw.ellipse(self.app.screen, (185,215,205), ellipse_outline)
+        pygame.draw.ellipse(self.app.screen, (145, 190, 166), ellipse_outline, width=5)
+
+        #draw professor
+        prof_img = image.load_png('professor.png')
+        prof_img = pygame.transform.scale(prof_img, (300,300))
+        prof_x = pos_x + 40
+        prof_y = pos_y - 200
+        self.app.screen.blit(prof_img, (prof_x, prof_y))
+
+        #ball start: professor 70,150
 
     def move_cursor(self):
         if self.app.DOWN_KEY:
@@ -274,6 +304,33 @@ class CreditsMenu(Menu):
             self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 90)
             self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 110)
             self.blit_()
+
+class Pokeball():
+    def __init__(self, x,y):
+        self.x = x - 15
+        self.y = y
+        self.direction = 'up'
+        self.velosity = 3
+        self.max_y =  y - 180
+        self.min_y = y - 20
+
+    def move(self):
+        if self.direction == 'up':
+            if self.y >= self.max_y:
+                self.y -= self.velosity
+            else:
+                self.direction = 'down'
+        if self.direction == 'down':
+            if self.y <= self.min_y:
+                self.y += self.velosity
+            else: self.direction = 'up'
+
+    def render_ball(self, screen):
+        ball_img = image.load_png('pokeball.png')
+        ball_img = pygame.transform.scale(ball_img, (30,30))
+        screen.blit(ball_img, (self.x, self.y))
+
+
 
 
 
