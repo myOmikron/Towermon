@@ -1,20 +1,16 @@
-import pygame
+import time
+from os.path import exists
+
 from pygame.mixer import Sound
 
-import settings
-import utils.image
-from entities.Test import Test
 from entities.level import Level
-from entities.player import Player
 from menu import *
 from utils import image
-from os.path import exists
 
 
 class Game:
     level: Level
     scale: int
-    player: Player
     font: Font
     playing: bool
     screen: pg.SurfaceType
@@ -34,7 +30,7 @@ class Game:
 
         self.scale = 1
         self.level = Level.load_level("level_0.dat")
-        self.player = Player("player.png", self.scale)
+        # self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
         #if settings.DEBUG:
         #    self.test = Test(self.scale, self.level.map.grid)
@@ -52,8 +48,12 @@ class Game:
 
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
+        offset = (0, 0)
+        counter = 0
+
+        trigger_rerender = False
         self.level.start(self.screen)
-        self.level.render(self.scale)
+        self.level.render(self.scale, offset, trigger_rerender)
 
         self.playlist = self.create_playlist()
         pygame.mixer.music.load(self.playlist[0])
@@ -94,7 +94,8 @@ class Game:
                 # Handle selecting
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     # print(event.button)
-                    self.level.highlight(pygame.mouse.get_pos())
+                    self.level.highlight(pygame.mouse.get_pos(), offset)
+                    trigger_rerender = True
                 # Handle player move events
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
                     if event.key == pygame.K_d:
@@ -122,40 +123,59 @@ class Game:
                     #            self.test.spawn()
 
             # Move player
-            if move_east:
-                # Only move if the opposite direction is not pressed
-                if not move_west:
-                    self.player.move_east(time_delta)
-            elif move_west:
-                self.player.move_west(time_delta)
-            if move_north:
-                # Only move if the opposite direction is not pressed
-                if not move_south:
-                    self.player.move_north(time_delta)
-            elif move_south:
-                self.player.move_south(time_delta)
+            if time.time_ns() >= counter:
+                if move_east:
+                    # Only move if the opposite direction is not pressed
+                    if not move_west:
+                        new_x = offset[0] + 1
+                        if new_x > self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE):
+                            new_x = self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE)
+                        offset = new_x, offset[1]
+                        counter = time.time_ns() + 100_000_000
+                elif move_west:
+                    new_x = offset[0] - 1
+                    if new_x < 0:
+                        new_x = 0
+                    offset = new_x, offset[1]
+                    counter = time.time_ns() + 100_000_000
+                if move_north:
+                    # Only move if the opposite direction is not pressed
+                    if not move_south:
+                        new_y = offset[1] - 1
+                        if new_y < 0:
+                            new_y = 0
+                        offset = offset[0], new_y
+                        counter = time.time_ns() + 100_000_000
+                elif move_south:
+                    new_y = offset[1] + 1
+                    if new_y > self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE):
+                        new_y = self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE)
+                    offset = offset[0], new_y
+                    counter = time.time_ns() + 100_000_000
 
             if self.level.game_over:
                 self.playing = False
 
-            #if settings.DEBUG:
+            # if settings.DEBUG:
             #    self.test.update(time_delta)
             self.level.update(time_delta)
 
             # Render map
-            self.level.render(self.scale)
+            self.level.render(self.scale, offset, trigger_rerender)
 
-            #if settings.DEBUG:
+            # if settings.DEBUG:
             #    self.test.render(self.scale)
 
             # Render player
-            self.player.render(time_delta, self.scale)
+            # self.player.render(time_delta, self.scale)
 
             fps = str(int(self.clock.get_fps()))
             fps_t = self.font.render(fps, True, pygame.Color("RED"))
             pygame.display.get_surface().blit(fps_t, (0, 0))
 
             pygame.display.update()
+
+            trigger_rerender = False
 
 
 class App:

@@ -25,6 +25,7 @@ from utils import image
 from json_utils import json_parser
 from entities.pokemon_tower import PokemonTower, Projectile
 
+
 def generate_map(name, width, height):
     with open(name, "w") as fp:
         for h in range(height):
@@ -64,6 +65,7 @@ class Map:
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
         self.pokemon_imgs = self.load_imgs()
+        self.offset = (0, 0)
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -75,12 +77,11 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile_from_grid((int(position.x), int(position.y)))
 
-
     @staticmethod
     def load_imgs():
         img_dict = dict()
         for pokemon in json_parser.get_pokemon_list():
-            img_dict[pokemon] = utils.image.load_png(pokemon+'.png')
+            img_dict[pokemon] = utils.image.load_png(pokemon + '.png')
         return img_dict
 
     def _render_tower(self, position: Tuple[int, int]):
@@ -88,9 +89,9 @@ class Map:
         img = self.pokemon_imgs[tower.name]
         self._render_tile(img, position)
 
-    def _render_tile_from_grid(self, position: Tuple[int, int]):
+    def _render_tile_from_grid(self, position: Tuple[int, int], offset: Tuple[int, int]):
         x, y = position
-        tile = self.grid[y][x]
+        tile = self.grid[y + offset[1]][x + offset[0]]
         self._render_tile(self.tiles[tile.surface_id], position)
         if position in self.towers.keys():
             self._render_tower((x, y))
@@ -130,27 +131,30 @@ class Map:
         num_y = math.ceil(screen_height / scaled_tile_size)
         return num_x, num_y
 
-    def _render(self, scale: float) -> None:
+    def _render(self, scale: float, offset: Tuple[int, int], trigger_rerender) -> None:
         """Trigger a complete rerender."""
-        if self.scale != scale:
+        if self.scale != scale or self.offset != offset or trigger_rerender:
             self.scale = scale
+            self.offset = offset
             num_x, num_y = self._calc_visible_tiles()
             self.map_screen.fill((68, 167, 169))
             for y in range(0, num_y + 2):
                 for x in range(0, num_x + 2):
                     if y < self.height and x < self.width:
-                        self._render_tile_from_grid((x, y))
-                        if (x, y) in self.towers.keys():
-                            self._render_tower((x, y))
+                        self._render_tile_from_grid((x, y), offset)
+                        if (x + offset[0], y + offset[1]) in self.towers.keys():
+                            self._render_tower((x + offset[0], y + offset[1]))
 
     def update(self, delta_time: float) -> None:
         ...
 
-    def render(self, scale: float) -> None:
+    def render(self, scale: float, offset: Tuple[int, int], trigger_rerender: bool) -> None:
         """Render the level.
+        :param trigger_rerender: Force rerender
         :param scale: Scale factor
+        :param offset: Offset to apply
         """
-        self._render(scale)
+        self._render(scale, offset, trigger_rerender)
         self.game_screen.blit(self.map_screen, (0, 0))
 
 
@@ -247,7 +251,6 @@ class Level:
         self.timer = Timer(settings.TIMER, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
         self.wallet = Wallet(settings.COINS, screen)
         self.hud.update_coins(self.wallet.coins)
-
 
     def render_path(self, path, scale):
         """
@@ -377,36 +380,37 @@ class Level:
                 fp.write("".join([f"{int(self.map_gird[y][x].tile_type)};{self.map_gird[y][x].surface_id} " for x in
                                   range(self.width)]) + "\n")
 
-    def highlight(self, position: Tuple[int, int]):
+    def highlight(self, position: Tuple[int, int], offset: Tuple[int, int]):
         """
         Highlight or un highlight a tile on the map
+        :param offset: Offset of the camera
         :param position: screen coordinates of the cell to highlight
         :return:
         """
         x, y = position
         if 0 <= x <= settings.SCREEN_WIDTH and 0 <= y <= settings.SCREEN_HEIGHT - settings.UI_HEIGHT:
             x, y = Level._pixel_to_grid_coord(x, y, self.scale)
+            x, y = x + offset[0], y + offset[1]
             if x < self.map.width and y < self.map.height:
                 if self.current_selection is not None:
                     if self.current_selection == (x, y):
-                        self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                        self.map.grid[y][x].highlighted = not self.map.grid[y][x].highlighted
                         self.current_selection = None
                     else:
-                        self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted = False if \
-                            self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted else True
-                        self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
-                        self.map._render_tile_from_grid(self.current_selection)
+                        self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted = not \
+                            self.map.grid[self.current_selection[1]][self.current_selection[0]].highlighted
+                        self.map.grid[y][x].highlighted = not self.map.grid[y][x].highlighted
                         self.current_selection = (x, y)
                 else:
-                    self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                    self.map.grid[y][x].highlighted = not self.map.grid[y][x].highlighted
                     self.current_selection = (x, y)
-                if self.current_selection is not None and self\
-                        .ui.current_selection is not None:
+                if self.current_selection is not None and self.ui.current_selection is not None:
                     # place tower
-                    self.map.grid[y][x].highlighted = False if self.map.grid[y][x].highlighted else True
+                    self.map.grid[y][x].highlighted = not self.map.grid[y][x].highlighted
                     self.current_selection = None
-                    self.build_tower(PokemonTower(json_parser.get_pokemon_list()[self.ui.current_selection],x,y), (x, y))
-                self.map._render_tile_from_grid((x, y))
+                    self.build_tower(
+                        PokemonTower(json_parser.get_pokemon_list()[self.ui.current_selection], x, y), (x, y)
+                    )
             return
         self.ui.click(position)
 
@@ -467,15 +471,17 @@ class Level:
                             # calculate coins
                             if enemy.life <= 0:
                                 self.wallet.coins += 50
-                                print(enemy.type +str(enemy.life))
+                                print(enemy.type + str(enemy.life))
         self.timer.update(delta_time)
 
-    def render(self, scale: float) -> None:
+    def render(self, scale: float, offset: Tuple[int, int], trigger_rerender: bool) -> None:
         """Render the level.
+        :param trigger_rerender: Force a rerender
+        :param offset: Offset to apply
         :param scale: Scale factor
         """
         self.scale = scale
-        self.map.render(scale)
+        self.map.render(scale, offset, trigger_rerender)
         for pokemon in self.map.towers.values():
             if pokemon.is_active():
                 self.render_attack(pokemon)
@@ -489,8 +495,6 @@ class Level:
         self.hud.render(1)
         self.ui.render()
 
-
-
     def render_bullets(self):
         for bullet in self.bullets:
             if len(bullet.path) == 0:
@@ -500,19 +504,19 @@ class Level:
                 while len(bullet.path) > 0 and (i < 2):
                     bullet.render(self.game_screen)
                     bullet.move()
-                    i+=1
+                    i += 1
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
-        #pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
-        #pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
-        #side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
-        pos_x = pixel_pos[0]-2
-        pos_y = pixel_pos[1]-2
-        side = self.scale * settings.TILE_SIZE +4
+        # pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
+        # pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
+        # side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
+        pos_x = pixel_pos[0] - 2
+        pos_y = pixel_pos[1] - 2
+        side = self.scale * settings.TILE_SIZE + 4
         surface = Surface((side, side))
         surface.fill((0, 0, 0))
         surface.set_colorkey((0, 0, 0))
-        rect = pygame.Rect(0,0, side ,side)
-        pygame.draw.rect(surface,pygame.Color(255,0,0), rect, width=2)
-        self.game_screen.blit(surface, (pos_x,pos_y))
+        rect = pygame.Rect(0, 0, side, side)
+        pygame.draw.rect(surface, pygame.Color(255, 0, 0), rect, width=2)
+        self.game_screen.blit(surface, (pos_x, pos_y))

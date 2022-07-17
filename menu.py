@@ -40,7 +40,7 @@ class Menu:
         self.app.reset_keys()
 
     def display_menu(self):
-        ...
+        pass
 '''
     def create_dropdown(self) -> Dropdown:
         screen = self.app.screen
