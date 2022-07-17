@@ -236,6 +236,11 @@ class App:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x,y = pygame.mouse.get_pos()
+                if x > 70 and x < 470 and y > 100 and y < 500:
+                    poke_sound = pygame.mixer.Sound('assets/audio/CHARIZARD.ogg')
+                    pygame.mixer.Sound.play(poke_sound)
 
     # help function for menu inputs
     def reset_keys(self):

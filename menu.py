@@ -83,6 +83,7 @@ class MainMenu(Menu):
             pokeball.render_ball(self.app.screen)
             pokeball.move()
 
+
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
@@ -102,14 +103,14 @@ class MainMenu(Menu):
         self.app.screen.blit(bg_picture, (0, 0))
 
         #get screen_size for positions
-        pos_x, pos_y = self.app.screen.get_size()
+        screen_x, screen_y = self.app.screen.get_size()
 
         #draw Ellipse with Border
-        pos_x =  pos_x - 450
-        pos_y = pos_y - 200
-        ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
-        pygame.draw.ellipse(self.app.screen, (185,215,205), ellipse_outline)
-        pygame.draw.ellipse(self.app.screen, (145, 190, 166), ellipse_outline, width=5)
+        pos_x =  screen_x - 450
+        pos_y = screen_y - 200
+        prof_ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
+        pygame.draw.ellipse(self.app.screen, (185,215,205), prof_ellipse_outline)
+        pygame.draw.ellipse(self.app.screen, (145, 190, 166), prof_ellipse_outline, width=5)
 
         #draw professor
         prof_img = image.load_png('professor.png')
@@ -118,7 +119,18 @@ class MainMenu(Menu):
         prof_y = pos_y - 200
         self.app.screen.blit(prof_img, (prof_x, prof_y))
 
-        #ball start: professor 70,150
+        #draw pokemon Ellipse:
+        pos_x = 100
+        pos_y = 400
+        poke_ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
+        pygame.draw.ellipse(self.app.screen, (185,215,205), poke_ellipse_outline)
+        pygame.draw.ellipse(self.app.screen, (145, 190, 166), poke_ellipse_outline, width=5)
+
+        # draw Pokemon
+        pokemon_img = image.load_png('charizard.png')
+        pokemon_img = pygame.transform.scale(pokemon_img, (400,400))
+        pokemon_img = pygame.transform.flip(pokemon_img, True, False)
+        self.app.screen.blit(pokemon_img, (70, 100))
 
     def move_cursor(self):
         if self.app.DOWN_KEY:
