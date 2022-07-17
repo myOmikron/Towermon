@@ -1,4 +1,6 @@
 import sys
+
+import pygame
 import pygame as pg
 from pygame.font import Font
 import pygame_widgets
@@ -22,7 +24,7 @@ class Menu:
         self.cursor_rect = pg.Rect(0, 0, 20, 20)
         """ offset for the cursor, that it is next to Menu Options"""
         self.offset = - 100
-        self.font = pg.font.Font("assets/Font/Gameplay.ttf", 20)
+        self.font = pg.font.Font("assets/Font/power green.ttf", 25)
         self.font_big = pg.font.Font("assets/Font/Gameplay.ttf", 40)
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
@@ -41,7 +43,7 @@ class Menu:
 
     def display_menu(self):
         ...
-
+'''
     def create_dropdown(self) -> Dropdown:
         screen = self.app.screen
         x = self.mid_w - 50
@@ -51,40 +53,49 @@ class Menu:
         choices = ["easy", "medium", "hard", "insane"]
         dropdown = Dropdown(screen,x,y,width,height,'Select Diffculty', choices, borderRadius=3, colour=pg.Color('grey'),  direction='down', textHAlign='left')
         return dropdown
-
+'''
 class MainMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
         self.state = 'Start'
+        self.difficulties = ['', 'Trainer', 'Gym Leader', 'Elite Four', 'Champ' ]
+        self.difficulty = 0
+
         self.startx, self.starty = self.mid_w, self.mid_h + 10
-        self.exitx, self.exity = self.mid_w, self.mid_h + 40
-        self.optionsx, self.optionsy = self.mid_w, self.mid_h + 70
-        self.creditsx, self.creditsy = self.mid_w, self.mid_h + 100
+        self.difficultyx, self.difficultyy = self.mid_w, self.mid_h + 40
+        self.exitx, self.exity = self.mid_w, self.mid_h + 70
+        self.optionsx, self.optionsy = self.mid_w, self.mid_h + 100
+        self.creditsx, self.creditsy = self.mid_w, self.mid_h + 130
+
         self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
-        self.dropdown = self.create_dropdown()
+        #self.dropdown = self.create_dropdown()
         self.error = ""
 
     def display_menu(self):
         self.show_display = True
         while self.show_display:
-            events = self.app.check_events()
+            self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Start Game', self.startx, self.starty)
+            self.draw_text(self.font, f'<Mode: {self.difficulties[self.difficulty]}>', self.difficultyx, self.difficultyy)
             self.draw_text(self.font, 'Exit Game', self.exitx, self.exity)
             self.draw_text(self.font, 'Options', self.optionsx, self.optionsy)
             self.draw_text(self.font, 'Credits', self.creditsx, self.creditsy)
             self.draw_cursor()
-            pygame_widgets.update(events)
+            #pygame_widgets.update(events)
             self.blit_()
 
     def move_cursor(self):
         if self.app.DOWN_KEY:
             if self.state == 'Start':
+                self.cursor_rect.midtop = (self.difficultyx + self.offset, self.difficultyy)
+                self.state = 'Difficulty'
+            elif self.state == 'Difficulty':
                 self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
                 self.state = 'Exit'
             elif self.state == 'Exit':
@@ -101,9 +112,12 @@ class MainMenu(Menu):
             if self.state == 'Start':
                 self.cursor_rect.midtop = (self.creditsx + self.offset, self.creditsy)
                 self.state = 'Credits'
-            elif self.state == 'Exit':
+            elif self.state == 'Difficulty':
                 self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
                 self.state = 'Start'
+            elif self.state == 'Exit':
+                self.cursor_rect.midtop = (self.difficultyx + self.offset, self.difficultyy)
+                self.state = 'Difficulty'
             elif self.state == 'Options':
                 self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
                 self.state = 'Exit'
@@ -111,15 +125,27 @@ class MainMenu(Menu):
                 self.cursor_rect.midtop = (self.optionsx + self.offset, self.optionsy)
                 self.state = 'Options'
 
+        elif self.app.RIGHT_KEY:
+            if self.state == 'Difficulty':
+                index = self.difficulty + 1
+                if index >= len(self.difficulties):
+                    self.difficulty = index - len(self.difficulties)
+                else: self.difficulty = index
+        elif self.app.LEFT_KEY:
+            if self.state == 'Difficulty':
+                index = self.difficulty - 1
+                if index < 0:
+                    self.difficulty = index + len(self.difficulties)
+                else: self.difficulty = index
+
     def check_input(self):
         self.move_cursor()
         if self.app.START_KEY:
             if self.state == 'Start':
-                    difficulty = self.dropdown.getSelected()
-                    if difficulty != None:
-                        self.set_diffictuly(difficulty)
+                    if self.difficulty != 0:
+                        self.set_diffictuly(self.difficulty)
                         self.app.playing = True
-                    else: self.error = "Please select difficulty before starting the game!"
+                    else: self.error = "Please use left and right arrow to select a difficulty mode!"
             elif self.state == 'Options':
                 self.app.menu = self.app.options
             elif self.state == 'Exit':
@@ -129,9 +155,10 @@ class MainMenu(Menu):
                 self.app.menu = self.app.credits
             self.show_display = False
 
-    @staticmethod
-    def set_diffictuly(difficulty: str):
-        dict = json_utils.json_parser.get_game_settings(difficulty)
+
+    def set_diffictuly(self, difficulty: int):
+        difficulty_str = self.difficulties[difficulty]
+        dict = json_utils.json_parser.get_game_settings(difficulty_str)
         settings.COINS = dict["coins"]
         settings.TIMER = dict["timer"]
         settings.ENEMY_LIFE = dict["enemy_life"]

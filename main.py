@@ -26,7 +26,7 @@ class Game:
         self.screen = screen
         # Set running and playing variables
         self.playing = False
-        self.playlist = self.create_playlist()
+        self.playlist = []
 
         # Fill screen black
         self.screen.fill((0, 0, 0))
@@ -54,6 +54,7 @@ class Game:
         self.level.start(self.screen)
         self.level.render(self.scale)
 
+        self.playlist = self.create_playlist()
         pygame.mixer.music.load(self.playlist[0])
         pygame.mixer.music.play()
         self.playlist.pop(0)
@@ -171,6 +172,8 @@ class App:
     playing: bool = False
     UP_KEY: bool = False
     DOWN_KEY: bool = False
+    RIGHT_KEY: bool = False
+    LEFT_KEY: bool = False
     START_KEY: bool = False
     BACK_KEY: bool = False
 
@@ -222,13 +225,19 @@ class App:
                 if event.key == pygame.K_UP:
                     self.UP_KEY = True
                     self.click_sound.play()
+                if event.key == pygame.K_RIGHT:
+                    self.RIGHT_KEY = True
+                    self.click_sound.play()
+                if event.key == pygame.K_LEFT:
+                    self.LEFT_KEY = True
+                    self.click_sound.play()
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
 
     # help function for menu inputs
     def reset_keys(self):
-        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
+        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY = False, False, False, False, False, False
 
     def run(self):
         while self.running:
