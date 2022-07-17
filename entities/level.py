@@ -449,12 +449,12 @@ class Level:
             self.timer.duration = settings.TIMER
 
         self.map.update(delta_time)
+
         for spawner in self.spawners:
             spawner.update_spawn(delta_time, self.spawn_frequenz)
             spawner.update(delta_time)
             for pokemon in self.map.towers.values():
-                if pokemon.is_active():
-                    self.render_attack(pokemon)
+                pokemon.deactivate()
                 for spawner in self.spawners:
                     for enemy in spawner.on_the_way:
                         enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
@@ -462,11 +462,8 @@ class Level:
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
                             bullet = Projectile(pos, enemy_pos, enemy)
                             self.bullets.append(bullet)
-        for bullet in self.bullets:
-            if len(bullet.path) > 0:
-                bullet.move()
-                bullet.render(self.game_screen)
-            else: self.bullets.remove(bullet)
+
+
 
         self.timer.update(delta_time)
 
@@ -476,6 +473,10 @@ class Level:
         """
         self.scale = scale
         self.map.render(scale)
+        for pokemon in self.map.towers.values():
+            if pokemon.is_active():
+                self.render_attack(pokemon)
+        self.render_bullets()
         for spawner in self.spawners:
             spawner.render(scale)
             # self.render_path(spawner.path, scale)
@@ -484,14 +485,30 @@ class Level:
         self.hud.render(1)
         self.ui.render()
 
+
+
+    def render_bullets(self):
+        for bullet in self.bullets:
+            if len(bullet.path) == 0:
+                self.bullets.remove(bullet)
+            else:
+                i = 0
+                while len(bullet.path) > 0 and (i < 2):
+                    bullet.render(self.game_screen)
+                    bullet.move()
+                    i+=1
+
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
         #pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
         #pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
         #side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
-        pos_x = pixel_pos[0]-1
-        pos_y = pixel_pos[1]-1
-        side = self.scale * settings.TILE_SIZE +2
-        rect = pygame.Rect(pos_x,pos_y, side ,side)
-        pygame.draw.rect(self.game_screen,pygame.Color(255,0,0,1), rect, width=3)
-        pygame.display.update()
+        pos_x = pixel_pos[0]-2
+        pos_y = pixel_pos[1]-2
+        side = self.scale * settings.TILE_SIZE +4
+        surface = Surface((side, side))
+        surface.fill((0, 0, 0))
+        surface.set_colorkey((0, 0, 0))
+        rect = pygame.Rect(0,0, side ,side)
+        pygame.draw.rect(surface,pygame.Color(255,0,0), rect, width=2)
+        self.game_screen.blit(surface, (pos_x,pos_y))

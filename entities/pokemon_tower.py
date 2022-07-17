@@ -3,6 +3,7 @@ import time
 import pygame.mixer
 
 import entities.entity
+import settings
 from json_utils import json_parser as parser
 from entities import entity, tile
 from pygame import Surface
@@ -46,8 +47,8 @@ class PokemonTower:
                 attack_sound.play()
                 return True
             else:
-                self.active = False
                 return False
+
 
 
 
@@ -61,6 +62,10 @@ class PokemonTower:
 
     def is_active(self):
         return self.active
+
+    def deactivate(self):
+        self.active=False
+
 
 class Projectile():
     def __init__(self, pos, enemy_pos, enemy):
@@ -94,6 +99,9 @@ class Projectile():
             self.path.pop(0)
 
 
-    def render(self, surface: Surface):
-        pygame.draw.circle(surface, self.color, self.pos, self.radius)
-        pygame.display.update()
+    def render(self, game_screen: Surface):
+        surface = Surface((5,5))
+        surface.fill((0,0,0))
+        surface.set_colorkey((0,0,0))
+        pygame.draw.circle(surface, self.color,(3,3), self.radius)
+        game_screen.blit(surface, self.pos)
