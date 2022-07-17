@@ -84,8 +84,8 @@ class Map:
             img_dict[pokemon] = utils.image.load_png(pokemon + '.png')
         return img_dict
 
-    def _render_tower(self, position: Tuple[int, int]):
-        tower = self.towers[position]
+    def _render_tower(self, position: Tuple[int, int], offset: Tuple[int, int]):
+        tower = self.towers[(position[0] + offset[0], position[1] + offset[1])]
         img = self.pokemon_imgs[tower.name]
         self._render_tile(img, position)
 
@@ -95,8 +95,8 @@ class Map:
             return
         tile = self.grid[y + offset[1]][x + offset[0]]
         self._render_tile(self.tiles[tile.surface_id], position)
-        if position in self.towers.keys():
-            self._render_tower((x, y))
+        if (position[0] + offset[0], position[1] + offset[1]) in self.towers.keys():
+            self._render_tower((x, y), offset)
         if tile.highlighted:
             self._render_tile(self.high_light, position)
 
@@ -144,8 +144,6 @@ class Map:
                 for x in range(0, num_x + 2):
                     if y < self.height and x < self.width:
                         self._render_tile_from_grid((x, y), offset)
-                        if (x + offset[0], y + offset[1]) in self.towers.keys():
-                            self._render_tower((x + offset[0], y + offset[1]))
 
     def update(self, delta_time: float) -> None:
         ...
