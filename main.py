@@ -7,6 +7,7 @@ from entities.level import Level
 from entities.player import Player
 from menu import *
 from utils import image
+from os.path import exists
 
 
 class Game:
@@ -16,7 +17,7 @@ class Game:
     font: Font
     playing: bool
     screen: pg.SurfaceType
-    # test: Test
+    playlist: [str]
 
     def __init__(self, screen: pg.SurfaceType):
         # Set Keys on default for menu actions
@@ -25,6 +26,7 @@ class Game:
         self.screen = screen
         # Set running and playing variables
         self.playing = False
+        self.playlist = self.create_playlist()
 
         # Fill screen black
         self.screen.fill((0, 0, 0))
@@ -36,10 +38,29 @@ class Game:
         #if settings.DEBUG:
         #    self.test = Test(self.scale, self.level.map.grid)
 
+    @staticmethod
+    def create_playlist():
+        playlist = []
+        if exists('assets/audio/Route 1.wav'):
+            playlist.append('assets/audio/Route 1.mid')
+        if exists('assets/audio/Route 1.wav'):
+            playlist.append('assets/audio/Route 2.mid')
+        if exists('assets/audio/Route 1.wav'):
+            playlist.append('assets/audio/Route 3.mid')
+        return playlist
+
     def run(self):
         move_north, move_south, move_west, move_east = False, False, False, False
         self.level.start(self.screen)
         self.level.render(self.scale)
+
+        pygame.mixer.music.load(self.playlist[0])
+        pygame.mixer.music.play()
+        self.playlist.pop(0)
+        pygame.mixer.music.queue(self.playlist[0])
+        self.playlist.pop(0)
+        MUSIC_END = pygame.USEREVENT + 1
+        pygame.mixer.music.set_endevent(MUSIC_END)
 
         while self.playing:
             # Trigger clock
@@ -49,6 +70,17 @@ class Game:
                 # Handle quit event
                 if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.playing = False
+
+                # Handle Music Playlist
+                if event.type == MUSIC_END:
+                    if len(self.playlist) == 0:
+                        self.playlist = self.create_playlist()
+                        pygame.mixer.music.load(self.playlist[0])
+                        pygame.mixer.music.play()
+                        self.playlist.pop(0)
+                    if len(self.playlist) > 0:
+                        pygame.mixer.music.queue(self.playlist[0])
+                        self.playlist.pop(0)
                 # Handle zooming
                 elif event.type == pygame.MOUSEWHEEL:
                     if event.y < 0:
@@ -145,7 +177,6 @@ class App:
     def __init__(self):
         # Initialize the audio mixer
         pygame.mixer.pre_init(44100, 32, 2, 4096)
-
         # Game init
         pygame.init()
 
@@ -203,15 +234,13 @@ class App:
         while self.running:
             self.menu.display_menu()
             if self.playing:
-                pygame.mixer.music.load('assets/audio/Route 1.wav')
-                pygame.mixer.music.play(-1, 0, 0)
-                self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing
             pygame.mixer.music.unload()
             pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
             pygame.mixer.music.play(1, 0, 0)
+
 
 
 if __name__ == '__main__':

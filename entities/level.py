@@ -462,9 +462,6 @@ class Level:
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
                             bullet = Projectile(pos, enemy_pos, enemy)
                             self.bullets.append(bullet)
-
-
-
         self.timer.update(delta_time)
 
     def render(self, scale: float) -> None:
