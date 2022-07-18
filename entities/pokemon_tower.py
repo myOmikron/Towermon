@@ -49,9 +49,6 @@ class PokemonTower:
             else:
                 return False
 
-
-
-
     def in_range(self, enemy: entity.Enemy):
         enemy_x = enemy.position.x
         enemy_y = enemy.position.y
@@ -82,7 +79,7 @@ class Projectile():
         y = self.pos[1]
         goal_x = self.goal[0]
         goal_y = self.goal[1]
-        delta_x = goal_x -x
+        delta_x = goal_x - x
         delta_y = goal_y - y
         interval_x = delta_x / 30
         interval_y = delta_y / 30
@@ -90,7 +87,7 @@ class Projectile():
         while i <= 30:
             point = [x + interval_x * i, y + interval_y * i]
             points.append(point)
-            i+=1
+            i += 1
         return points
 
     def move(self):
@@ -98,13 +95,12 @@ class Projectile():
             self.pos = self.path[0]
             self.path.pop(0)
 
-    def render(self, game_screen: Surface, offset: Tuple[int,int], scale: float):
+    def render(self, game_screen: Surface, offset: Tuple[int, int], scale: float):
         if scale != self.scale:
             for point in self.path:
                 point[0] = point[0] / self.scale * scale
                 point[1] = point[1] / self.scale * scale
                 self.scale = scale
-        dx,dy = (settings.TILE_SIZE/2 + offset[0]) *self.scale, (settings.TILE_SIZE/2 + offset[1]) *self.scale
-        pos = self.pos[0]+ dx, self.pos[1] + dy
-        pygame.draw.circle(game_screen, self.color,pos, self.radius)
-
+        dx, dy = (settings.TILE_SIZE / 2 + offset[0]) * self.scale, (settings.TILE_SIZE / 2 + offset[1]) * self.scale
+        pos = self.pos[0] + dx, self.pos[1] + dy
+        pygame.draw.circle(game_screen, self.color, pos, self.radius)

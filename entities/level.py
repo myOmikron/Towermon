@@ -459,10 +459,9 @@ class Level:
             spawner.update_spawn(delta_time, self.spawn_frequenz)
             spawner.update(delta_time)
             for pokemon in self.map.towers.values():
-                pokemon.deactivate()
                 for spawner in self.spawners:
                     for enemy in spawner.on_the_way:
-                        if pokemon.attack(enemy) == True:
+                        if pokemon.attack(enemy):
                             # Get Pixel coordinates
                             enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
@@ -472,7 +471,6 @@ class Level:
                             # calculate coins
                             if enemy.life <= 0:
                                 self.wallet.coins += 50
-                                print(enemy.type + str(enemy.life))
         self.timer.update(delta_time)
 
     def render(self, scale: float, offset: Tuple[int, int], trigger_rerender: bool) -> None:
@@ -486,6 +484,7 @@ class Level:
         for pokemon in self.map.towers.values():
             if pokemon.is_active():
                 self.render_attack(pokemon)
+                pokemon.deactivate()
         self.render_bullets()
         for spawner in self.spawners:
             spawner.render(scale, offset)
@@ -509,15 +508,9 @@ class Level:
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
-        # pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
-        # pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
-        # side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
         pos_x = pixel_pos[0] - 2 + self.scale*self.map.offset[0]
         pos_y = pixel_pos[1] - 2+ self.scale*self.map.offset[1]
         side = self.scale * settings.TILE_SIZE + 4
-        surface = Surface((side, side))
-        surface.fill((0, 0, 0))
-        surface.set_colorkey((0, 0, 0))
-        rect = pygame.Rect(0, 0, side, side)
-        pygame.draw.rect(surface, pygame.Color(255, 0, 0), rect, width=2)
-        self.game_screen.blit(surface, (pos_x, pos_y))
+        rect = pygame.Rect(pos_x, pos_y, side, side)
+        pygame.draw.rect(self.map.game_screen, pygame.Color(255, 0, 0), rect, width=2)
+
