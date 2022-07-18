@@ -1,4 +1,4 @@
-from typing import Union, Any
+from typing import Union, Any, Tuple
 
 import numpy as np
 import pygame
@@ -112,16 +112,20 @@ class AnimatedSprite(pygame.sprite.Sprite):
         """
         return np.vectorize(AnimatedSprite._scale)(x, w, h)
 
-    def render(self, scale: float) -> None:
+    def render(self, scale: float, offset: Tuple[int, int]) -> None:
         """
         Render the sprit
+        :param offset: Offset of the camera
         :param scale: float, current map scale
         :return: None
         """
 
         scaled_tile_size = round(settings.TILE_SIZE * scale)
-        x = round(self.position.x * scaled_tile_size)
-        y = round(self.position.y * scaled_tile_size)
+        y = round((self.position.y - offset[1]) * scaled_tile_size)
+        x = round((self.position.x - offset[0]) * scaled_tile_size)
+
+        if x < 0 or y < 0:
+            return
 
         # only update the scale or the rotation if it really changed
         if self.scale != scale:

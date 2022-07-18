@@ -487,7 +487,7 @@ class Level:
                 self.render_attack(pokemon)
         self.render_bullets()
         for spawner in self.spawners:
-            spawner.render(scale)
+            spawner.render(scale, offset)
             # self.render_path(spawner.path, scale)
         self.timer.render(scale)
         # self.health_bar.render(1)

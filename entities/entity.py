@@ -1,16 +1,14 @@
 from dataclasses import dataclass
-from typing import List
+from random import choice
+from typing import List, Tuple
 
-from numpy.typing import NDArray
 from pygame.sprite import AbstractGroup
-from pygame.surface import Surface
-from utils import image
+
+import settings
 from entities.navigation.Math.vector2 import Vector2
 from entities.sprite import AnimatedSprite
-
-from random import choice
 from json_utils import json_parser
-import settings
+from utils import image
 
 MAGIC_NUMBER = 0.04
 
@@ -101,9 +99,10 @@ class Enemy(Entity, AnimatedSprite):
         Entity.update(self, delta_time)
         AnimatedSprite.update(self, delta_time)
 
-    def render(self, scale: float) -> None:
+    def render(self, scale: float, offset: Tuple[int, int]) -> None:
         """
         render the enemy an update its direction angle
+        :param offset: Offset of the camera
         :param scale: float
         :return: None
         """
@@ -117,4 +116,4 @@ class Enemy(Entity, AnimatedSprite):
         elif self.direction.x > 0 and self.direction.y == 0.0:
             self.index_y = 2
 
-        super().render(scale)
+        super().render(scale, offset)

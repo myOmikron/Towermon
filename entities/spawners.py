@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Callable
+from typing import List, Callable, Tuple
 from copy import deepcopy
 
 from entities.entity import Entity, Enemy
@@ -78,11 +78,12 @@ class EnemySpawner(EntitySpawner):
         Enemy Spawner, can spawn enemies, control their pathing and render them.
     """
 
-    def render(self, scale: float) -> None:
+    def render(self, scale: float, offset: Tuple[int, int]) -> None:
         """
         Render all the entities from the spawner
+        :param offset: Offset of the camera
         :param scale: float
         :return: None
         """
         for entity in self.on_the_way:
-            entity.render(scale)
+            entity.render(scale, offset)
