@@ -328,9 +328,9 @@ class CreditsMenu(Menu):
             self.draw_text(self.font_big, 'Credits', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Made by', self.mid_w, self.mid_h + 10)
             self.draw_text(self.font,'Lukas Mahr', self.mid_w, self.mid_h + 50)
-            self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 70)
-            self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 90)
-            self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 110)
+            self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 80)
+            self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 110)
+            self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 140)
             self.blit_()
 
 
