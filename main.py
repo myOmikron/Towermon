@@ -38,7 +38,7 @@ class Game:
     @staticmethod
     def create_playlist():
         playlist = []
-        if exists('assets/audio/Route 1.mid'):
+        if exists('assets/audio/Route 1.wav'):
             playlist.append('assets/audio/Route 1.mid')
             playlist.append('assets/audio/Route 1.mid')
         if exists('assets/audio/Route 1.wav'):
