@@ -232,7 +232,7 @@ class App:
         self.menu = self.main_menu
         self.font_name = "assets/Font/Gameplay.ttf"
         self.click_sound = pygame.mixer.Sound('assets/audio/click.wav')
-        self.game = Game(self.screen)
+        
 
     def check_events(self):
         for event in pygame.event.get():
@@ -274,6 +274,7 @@ class App:
         while self.running:
             self.menu.display_menu()
             if self.playing:
+                self.game = Game(self.screen)
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing
