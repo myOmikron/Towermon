@@ -187,6 +187,7 @@ class MainMenu(Menu):
                     if self.difficulty != 0:
                         self.set_diffictuly(self.difficulty)
                         self.app.playing = True
+                        self.error = ""
                     else: self.error = "Please use left and right arrow to select a difficulty mode!"
             elif self.state == 'Options':
                 self.app.menu = self.app.options
