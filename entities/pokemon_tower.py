@@ -103,7 +103,7 @@ class Projectile():
                 point[0] = point[0] / self.scale * scale
                 point[1] = point[1] / self.scale * scale
                 self.scale = scale
-        dx, dy = offset[0], + offset[1]
-        pos = self.pos[0] + dx, self.pos[1] + dy
+        dx, dy = offset[0] * self.scale * settings.TILE_SIZE, offset[1] * self.scale * settings.TILE_SIZE
+        pos = self.pos[0] - dx, self.pos[1] - dy
         game_screen.blit(self.img,pos)
         #pygame.draw.circle(game_screen, self.color, pos, self.radius)

@@ -505,8 +505,8 @@ class Level:
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
-        pos_x = pixel_pos[0] - 2 + self.map.offset[0]
-        pos_y = pixel_pos[1] - 2+ self.map.offset[1]
+        pos_x = pixel_pos[0] - 2 - self.map.offset[0] * settings.TILE_SIZE * self.scale
+        pos_y = pixel_pos[1] - 2 - self.map.offset[1] * settings.TILE_SIZE * self.scale
         side = self.scale * settings.TILE_SIZE + 4
         rect = pygame.Rect(pos_x, pos_y, side, side)
         pygame.draw.rect(self.map.game_screen, pygame.Color(255, 0, 0), rect, width=2)
