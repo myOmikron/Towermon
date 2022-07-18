@@ -345,6 +345,8 @@ class GameOverMenu(Menu):
             self.app.check_events()
             if self.app.START_KEY:
                 self.app.menu = self.app.main_menu
+                pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
+                pg.mixer.music.play(0, 0, 0)
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
             self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 40)

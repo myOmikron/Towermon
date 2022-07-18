@@ -169,8 +169,8 @@ class Game:
 
             if self.level.game_over:
                 # Gameover Sound
-                pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
-                pg.mixer.music.play(-1, 0, 0)
+                pg.mixer.music.load('assets/audio/Voltorb Flip win.ogg')
+                pg.mixer.music.play(0, 0, 0)
 
                 self.playing = False
 
