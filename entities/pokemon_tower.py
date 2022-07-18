@@ -47,6 +47,7 @@ class PokemonTower:
                 attack_sound.play()
                 return True
             else:
+                self.deactivate()
                 return False
 
     def in_range(self, enemy: entity.Enemy):
@@ -101,6 +102,6 @@ class Projectile():
                 point[0] = point[0] / self.scale * scale
                 point[1] = point[1] / self.scale * scale
                 self.scale = scale
-        dx, dy = (settings.TILE_SIZE / 2 + offset[0]) * self.scale, (settings.TILE_SIZE / 2 + offset[1]) * self.scale
+        dx, dy = (settings.TILE_SIZE / 2* self.scale) +offset[0] , (settings.TILE_SIZE / 2 * self.scale) + offset[1]
         pos = self.pos[0] + dx, self.pos[1] + dy
         pygame.draw.circle(game_screen, self.color, pos, self.radius)
