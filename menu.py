@@ -337,6 +337,8 @@ class CreditsMenu(Menu):
 class GameOverMenu(Menu):
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.game = self.app.game
+        self.stage = self.game.level.stage
 
     def display_menu(self):
         self.show_display = True
@@ -349,9 +351,9 @@ class GameOverMenu(Menu):
                 pg.mixer.music.play(0, 0, 0)
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
-            self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 40)
-            self.draw_text(self.font_big, 'Score: ' + str(self.level.stage - 1), self.mid_w, self.mid_h)
-            self.draw_text(self.font, ' PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 30)
+            self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 50)
+            self.draw_text(self.font, 'Score: ' + str(self.stage - 1), self.mid_w, self.mid_h + 20)
+            self.draw_text(self.font, ' PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 400)
             self.blit_()
 
 class Pokeball():
