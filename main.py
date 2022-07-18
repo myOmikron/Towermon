@@ -40,9 +40,12 @@ class Game:
         playlist = []
         if exists('assets/audio/Route 1.wav'):
             playlist.append('assets/audio/Route 1.mid')
+            playlist.append('assets/audio/Route 1.mid')
         if exists('assets/audio/Route 1.wav'):
             playlist.append('assets/audio/Route 2.mid')
+            playlist.append('assets/audio/Route 2.mid')
         if exists('assets/audio/Route 1.wav'):
+            playlist.append('assets/audio/Route 3.mid')
             playlist.append('assets/audio/Route 3.mid')
         return playlist
 
@@ -56,8 +59,8 @@ class Game:
         self.level.render(self.scale, offset, trigger_rerender)
 
         self.playlist = self.create_playlist()
-        pygame.mixer.music.load(self.playlist[0])
-        pygame.mixer.music.play()
+        soundtrack = pygame.mixer.music.load(self.playlist[0])
+        pygame.mixer.music.play(1,0,500)
         self.playlist.pop(0)
         pygame.mixer.music.queue(self.playlist[0])
         self.playlist.pop(0)
@@ -80,7 +83,7 @@ class Game:
                     if len(self.playlist) == 0:
                         self.playlist = self.create_playlist()
                         pygame.mixer.music.load(self.playlist[0])
-                        pygame.mixer.music.play()
+                        pygame.mixer.music.play(1,0,500)
                         self.playlist.pop(0)
                     if len(self.playlist) > 0:
                         pygame.mixer.music.queue(self.playlist[0])
