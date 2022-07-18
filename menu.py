@@ -24,6 +24,7 @@ class Menu:
         self.offset = - 100
         self.font = pg.font.Font("assets/Font/power green.ttf", 25)
         self.font_big = pg.font.Font("assets/Font/Gameplay.ttf", 40)
+        self.error = ""
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -104,7 +105,7 @@ class MainMenu(Menu):
 
         self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
         #self.dropdown = self.create_dropdown()
-        self.error = ""
+
 
     def display_menu(self):
         self.show_display = True
@@ -191,11 +192,13 @@ class MainMenu(Menu):
                         self.error = ""
                     else: self.error = "Please use left and right arrow to select a difficulty mode!"
             elif self.state == 'Options':
+                self.error = ""
                 self.app.menu = self.app.options
             elif self.state == 'Exit':
                 pg.quit()
                 sys.exit()
             elif self.state == 'Credits':
+                self.error = ""
                 self.app.menu = self.app.credits
             self.show_display = False
 

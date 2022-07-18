@@ -71,6 +71,8 @@ class Game:
             for event in pygame.event.get():
                 # Handle quit event
                 if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
+                    pygame.mixer.music.play(-1, 0, 0)
                     self.playing = False
 
                 # Handle Music Playlist
@@ -271,6 +273,8 @@ class App:
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY = False, False, False, False, False, False
 
     def run(self):
+        pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
+        pygame.mixer.music.play(-1, 0, 0)
         while self.running:
             self.menu.display_menu()
             if self.playing:
@@ -278,9 +282,7 @@ class App:
                 self.game.playing = self.playing
                 self.game.run()
                 self.playing = self.game.playing
-            pygame.mixer.music.unload()
-            pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
-            pygame.mixer.music.play(1, 0, 0)
+
 
 
 
