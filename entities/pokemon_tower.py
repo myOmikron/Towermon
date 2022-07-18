@@ -3,6 +3,7 @@ import time
 import pygame.mixer
 
 import settings
+import utils.image
 from json_utils import json_parser as parser
 from entities import entity
 from pygame import Surface
@@ -70,8 +71,8 @@ class Projectile():
         self.scale = scale
         self.pos = pos
         self.goal = enemy_pos
-        self.radius = 3
-        self.color = pygame.Color(255,0,0)
+        img = utils.image.load_png('shoot.png')
+        self.img = pygame.transform.scale(img, (17, 17))
         self.path = self.calculate_points()
 
     def calculate_points(self):
@@ -102,6 +103,7 @@ class Projectile():
                 point[0] = point[0] / self.scale * scale
                 point[1] = point[1] / self.scale * scale
                 self.scale = scale
-        dx, dy = (settings.TILE_SIZE / 2* self.scale) +offset[0] , (settings.TILE_SIZE / 2 * self.scale) + offset[1]
+        dx, dy = offset[0], + offset[1]
         pos = self.pos[0] + dx, self.pos[1] + dy
-        pygame.draw.circle(game_screen, self.color, pos, self.radius)
+        game_screen.blit(self.img,pos)
+        #pygame.draw.circle(game_screen, self.color, pos, self.radius)

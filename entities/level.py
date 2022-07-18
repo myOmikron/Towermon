@@ -500,11 +500,8 @@ class Level:
             if len(bullet.path) == 0:
                 self.bullets.remove(bullet)
             else:
-                i = 0
-                while len(bullet.path) > 0 and (i < 2):
-                    bullet.render(self.game_screen, self.map.offset, self.map.scale)
-                    bullet.move()
-                    i += 1
+                bullet.render(self.game_screen, self.map.offset, self.map.scale)
+                bullet.move()
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
