@@ -38,7 +38,7 @@ class Game:
     @staticmethod
     def create_playlist():
         playlist = []
-        if exists('assets/audio/Route 1.wav'):
+        if exists('assets/audio/Route 1.mid'):
             playlist.append('assets/audio/Route 1.mid')
             playlist.append('assets/audio/Route 1.mid')
         if exists('assets/audio/Route 1.wav'):
@@ -275,7 +275,7 @@ class App:
                 if event.key == pygame.K_LEFT:
                     self.LEFT_KEY = True
                     self.click_sound.play()
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE and not self.game.level.game_over:
                     pygame.quit()
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
