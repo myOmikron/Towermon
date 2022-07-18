@@ -7,6 +7,8 @@ FPS_LOCK = 60
 
 TILE_SIZE = 64
 
+MAGIC_NUMBER = 0.04
+
 NEIGHBOURS = [(0, 1), (1, 0), (-1, 0), (0, -1)]  # (-1, 1), (1, -1), (1, 1), (-1, -1)
 
 ENEMY_LIFE = 20

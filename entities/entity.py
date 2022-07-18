@@ -10,12 +10,11 @@ from entities.sprite import AnimatedSprite
 from json_utils import json_parser
 from utils import image
 
-MAGIC_NUMBER = 0.04
-
 
 @dataclass(slots=True)
 class Entity:
     path: List[Vector2]
+    last_distance: float = None
     position: Vector2 = None
     direction: Vector2 = None
     goal: Vector2 = None
@@ -45,6 +44,7 @@ class Entity:
             return
         self.goal = goal
         self.direction = self.position.direction(goal)
+        self.last_distance = round(self.position.distance(self.goal), 3)
 
     def move(self, delta_time):
         """
@@ -66,14 +66,16 @@ class Entity:
             return
         self.move(delta_time)
         d = round(self.position.distance(self.goal), 3)
-        if d <= MAGIC_NUMBER:
+        if d <= settings.MAGIC_NUMBER or self.last_distance < d:
             self.position = self.goal
             if len(self.path) > 0:
-                # print(f"Target updated: {self.path}")
                 goal = self.path.pop(0)
                 self.set_target(goal)
+                return
             else:
                 self.at_goal = True
+                return
+        self.last_distance = d
 
 
 class Enemy(Entity, AnimatedSprite):
