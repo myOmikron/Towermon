@@ -293,8 +293,8 @@ class App:
         pg.mixer.music.play(-1, 0, 0)
         while self.running:
             self.menu.display_menu()
+            self.game = Game(self.screen)
             if self.playing:
-                self.game = Game(self.screen)
                 self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
