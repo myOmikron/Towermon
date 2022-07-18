@@ -2,7 +2,7 @@ import time
 from os.path import exists
 
 from pygame.mixer import Sound
-
+import pygame
 from entities.level import Level
 from menu import *
 from utils import image
@@ -19,7 +19,7 @@ class Game:
     def __init__(self, screen: pg.SurfaceType):
         # Set Keys on default for menu actions
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
-        self.clock = pygame.time.Clock()
+        self.clock = pg.time.Clock()
         self.screen = screen
         # Set running and playing variables
         self.playing = False
@@ -206,22 +206,22 @@ class App:
 
     def __init__(self):
         # Initialize the audio mixer
-        pygame.mixer.pre_init(44100, 32, 2, 4096)
+        pg.mixer.pre_init(44100, 32, 2, 4096)
         # Game init
-        pygame.init()
+        pg.init()
 
         # Set fullscreen && double buffering for performance improvement
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN | pg.DOUBLEBUF, 16)
 
-        pygame.mixer.music.set_volume(0.1)
-        pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
-        pygame.mixer.music.play(1, 0, 0)
+        pg.mixer.music.set_volume(0.1)
+        pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
+        pg.mixer.music.play(1, 0, 0)
 
         # Set allowed events for performance improvement
-        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+        pg.event.set_allowed([pg.QUIT, pg.KEYDOWN, pg.KEYUP])
 
-        pygame.display.set_caption("Tower defense")
-        pygame.display.set_icon(image.load_png("favicon.png"))
+        pg.display.set_caption("Tower defense")
+        pg.display.set_icon(image.load_png("favicon.png"))
 
         # Initialize menu objects
         self.main_menu = MainMenu(self)
@@ -233,48 +233,48 @@ class App:
         # set main_menu as current menu
         self.menu = self.main_menu
         self.font_name = "assets/Font/Gameplay.ttf"
-        self.click_sound = pygame.mixer.Sound('assets/audio/click.wav')
+        self.click_sound = pg.mixer.Sound('assets/audio/click.wav')
         
 
     def check_events(self):
-        for event in pygame.event.get():
+        for event in pg.event.get():
 
-            if event.type == pygame.QUIT:
+            if event.type == pg.QUIT:
                 self.running, self.playing = False, False
                 self.menu.run_display = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
                     self.START_KEY = True
-                if event.key == pygame.K_BACKSPACE:
+                if event.key == pg.K_BACKSPACE:
                     self.BACK_KEY = True
-                if event.key == pygame.K_DOWN:
+                if event.key == pg.K_DOWN:
                     self.DOWN_KEY = True
                     self.click_sound.play()
-                if event.key == pygame.K_UP:
+                if event.key == pg.K_UP:
                     self.UP_KEY = True
                     self.click_sound.play()
-                if event.key == pygame.K_RIGHT:
+                if event.key == pg.K_RIGHT:
                     self.RIGHT_KEY = True
                     self.click_sound.play()
-                if event.key == pygame.K_LEFT:
+                if event.key == pg.K_LEFT:
                     self.LEFT_KEY = True
                     self.click_sound.play()
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()
                     sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x,y = pygame.mouse.get_pos()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                x,y = pg.mouse.get_pos()
                 if x > 70 and x < 470 and y > 100 and y < 500:
-                    poke_sound = pygame.mixer.Sound('assets/audio/CHARIZARD.ogg')
-                    pygame.mixer.Sound.play(poke_sound)
+                    poke_sound = pg.mixer.Sound('assets/audio/CHARIZARD.ogg')
+                    pg.mixer.Sound.play(poke_sound)
 
     # help function for menu inputs
     def reset_keys(self):
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY = False, False, False, False, False, False
 
     def run(self):
-        pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
-        pygame.mixer.music.play(-1, 0, 0)
+        pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
+        pg.mixer.music.play(-1, 0, 0)
         while self.running:
             self.menu.display_menu()
             if self.playing:

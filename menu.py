@@ -1,7 +1,8 @@
 import sys
 
-import pygame
+
 import pygame as pg
+from pygame.locals import *
 from pygame.font import Font
 from utils import image
 
@@ -25,6 +26,10 @@ class Menu:
         self.font = pg.font.Font("assets/Font/power green.ttf", 25)
         self.font_big = pg.font.Font("assets/Font/Gameplay.ttf", 40)
         self.error = ""
+        pos_x, pos_y = self.app.screen.get_size()
+        pos_x = pos_x - 340
+        pos_y = pos_y - 250
+        self.pokeball = Pokeball(pos_x, pos_y)
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -46,7 +51,7 @@ class Menu:
     def draw_background(self):
         # Create gradient background
         bg_picture = image.load_png('gradient.png')
-        bg_picture = pygame.transform.scale(bg_picture, self.app.screen.get_size())
+        bg_picture = pg.transform.scale(bg_picture, self.app.screen.get_size())
         self.app.screen.blit(bg_picture, (0, 0))
 
         #get screen_size for positions
@@ -55,13 +60,13 @@ class Menu:
         #draw Ellipse with Border
         pos_x =  screen_x - 450
         pos_y = screen_y - 200
-        prof_ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
-        pygame.draw.ellipse(self.app.screen, (185,215,205), prof_ellipse_outline)
-        pygame.draw.ellipse(self.app.screen, (145, 190, 166), prof_ellipse_outline, width=5)
+        prof_ellipse_outline = pg.Rect(pos_x, pos_y,400,150)
+        pg.draw.ellipse(self.app.screen, (185,215,205), prof_ellipse_outline)
+        pg.draw.ellipse(self.app.screen, (145, 190, 166), prof_ellipse_outline, width=5)
 
         #draw professor
         prof_img = image.load_png('professor.png')
-        prof_img = pygame.transform.scale(prof_img, (300,300))
+        prof_img = pg.transform.scale(prof_img, (300,300))
         prof_x = pos_x + 40
         prof_y = pos_y - 200
         self.app.screen.blit(prof_img, (prof_x, prof_y))
@@ -69,15 +74,20 @@ class Menu:
         #draw pokemon Ellipse:
         pos_x = 100
         pos_y = 400
-        poke_ellipse_outline = pygame.Rect(pos_x, pos_y,400,150)
-        pygame.draw.ellipse(self.app.screen, (185,215,205), poke_ellipse_outline)
-        pygame.draw.ellipse(self.app.screen, (145, 190, 166), poke_ellipse_outline, width=5)
+        poke_ellipse_outline = pg.Rect(pos_x, pos_y,400,150)
+        pg.draw.ellipse(self.app.screen, (185,215,205), poke_ellipse_outline)
+        pg.draw.ellipse(self.app.screen, (145, 190, 166), poke_ellipse_outline, width=5)
 
         # draw Pokemon
         pokemon_img = image.load_png('charizard.png')
-        pokemon_img = pygame.transform.scale(pokemon_img, (400,400))
-        pokemon_img = pygame.transform.flip(pokemon_img, True, False)
+        pokemon_img = pg.transform.scale(pokemon_img, (400,400))
+        pokemon_img = pg.transform.flip(pokemon_img, True, False)
         self.app.screen.blit(pokemon_img, (70, 100))
+
+        #animate Pokeball
+        self.pokeball.render_ball(self.app.screen)
+        self.pokeball.move()
+
 '''
     def create_dropdown(self) -> Dropdown:
         screen = self.app.screen
@@ -109,17 +119,11 @@ class MainMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
-        pos_x, pos_y = self.app.screen.get_size()
-        pos_x = pos_x - 340
-        pos_y = pos_y - 250
-        pokeball = Pokeball(pos_x,pos_y)
+
         while self.show_display:
             self.app.check_events()
             self.check_input()
             self.draw_background()
-            pokeball.render_ball(self.app.screen)
-            pokeball.move()
-
 
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
@@ -221,17 +225,12 @@ class OptionsMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
-        pos_x, pos_y = self.app.screen.get_size()
-        pos_x = pos_x - 340
-        pos_y = pos_y - 250
-        pokeball = Pokeball(pos_x, pos_y)
+
         while self.show_display:
             self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
-            pokeball.render_ball(self.app.screen)
-            pokeball.move()
             self.draw_text(self.font_big, 'Options', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Volume', self.volx, self.voly)
             self.draw_text(self.font, 'Controls', self.controlsx, self.controlsy)
@@ -269,17 +268,11 @@ class VolumeMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
-        pos_x, pos_y = self.app.screen.get_size()
-        pos_x = pos_x - 340
-        pos_y = pos_y - 250
-        pokeball = Pokeball(pos_x, pos_y)
         while self.show_display:
             self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
-            pokeball.render_ball(self.app.screen)
-            pokeball.move()
             self.draw_text(self.font_big, 'Volume', self.mid_w, self.mid_h-40)
             self.draw_text(self.font, self.message, self.mid_w, self.mid_h)
             self.blit_()
@@ -301,17 +294,11 @@ class ControlsMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
-        pos_x, pos_y = self.app.screen.get_size()
-        pos_x = pos_x - 340
-        pos_y = pos_y - 250
-        pokeball = Pokeball(pos_x, pos_y)
         while self.show_display:
             self.app.check_events()
             self.check_input()
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
-            pokeball.render_ball(self.app.screen)
-            pokeball.move()
             self.draw_text(self.font_big, 'Controls', self.mid_w, self.mid_h - 40)
             # self.draw_cursor()
             self.blit_()
@@ -328,10 +315,7 @@ class CreditsMenu(Menu):
 
     def display_menu(self):
         self.show_display = True
-        pos_x, pos_y = self.app.screen.get_size()
-        pos_x = pos_x - 340
-        pos_y = pos_y - 250
-        pokeball = Pokeball(pos_x, pos_y)
+
         while self.show_display:
             self.app.check_events()
             if self.app.START_KEY or self.app.BACK_KEY:
@@ -339,8 +323,6 @@ class CreditsMenu(Menu):
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
-            pokeball.render_ball(self.app.screen)
-            pokeball.move()
             self.draw_text(self.font_big, 'Credits', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Made by', self.mid_w, self.mid_h + 10)
             self.draw_text(self.font,'Lukas Mahr', self.mid_w, self.mid_h + 50)
@@ -354,24 +336,26 @@ class Pokeball():
         self.x = x - 15
         self.y = y
         self.direction = 'up'
-        self.velosity = 3
-        self.max_y =  y - 180
-        self.min_y = y - 20
+        self.vel = 7  #Velosity
+        self.min_y = y - 20 #Pokeball fits neatly in professors hand
+        self.acc = 0.15 #Acceleration for gravity
 
     def move(self):
         if self.direction == 'up':
-            if self.y >= self.max_y:
-                self.y -= self.velosity
-            else:
+            self.vel -= self.acc # slow down
+            self.y -= self.vel #move up
+            if self.vel <= 0: # wenn pokeball has slowed down until turning point
                 self.direction = 'down'
         if self.direction == 'down':
-            if self.y <= self.min_y:
-                self.y += self.velosity
-            else: self.direction = 'up'
+            self.vel += self.acc #speed up
+            if self.y +self.vel >= self.min_y: #If Pokeball in Hand
+                self.direction = 'up'
+            else:
+                self.y += self.vel # move down
 
     def render_ball(self, screen):
         ball_img = image.load_png('pokeball.png')
-        ball_img = pygame.transform.scale(ball_img, (30,30))
+        ball_img = pg.transform.scale(ball_img, (30,30))
         screen.blit(ball_img, (self.x, self.y))
 
 
