@@ -441,8 +441,8 @@ class Level:
         :return:
         """
 
-        # if not self.health_bar.alive:
-        #    self.game_over = True
+        if not self.hud.health_bar.alive:
+            self.game_over = True
 
         if self.timer.finished and self.wave_done:
             self.update_stage()

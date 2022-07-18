@@ -10,11 +10,11 @@ TILE_SIZE = 64
 NEIGHBOURS = [(0, 1), (1, 0), (-1, 0), (0, -1)]  # (-1, 1), (1, -1), (1, 1), (-1, -1)
 
 ENEMY_LIFE = 20
-DEBUG = False
+DEBUG = True
 
-TIMER = 30
+TIMER = 5
 
-COINS = 5000
+COINS = 50
 
 MAP_TYPE_TO_INDEX = {
     "normal": 0,

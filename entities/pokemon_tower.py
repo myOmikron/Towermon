@@ -16,6 +16,7 @@ class PokemonTower:
         self.id = pokemon_data["id"]
         self.name = pokemon_data["name"]
         self.type = pokemon_data["type"]
+        self.attack_sound = pygame.mixer.Sound('assets/audio/click.wav')
         self.x = x
         self.y = y
 
@@ -45,25 +46,25 @@ class PokemonTower:
                 factor = parser.get_damage_factor(self.type, enemy.type)
                 damage = self.level * factor
                 enemy.take_life(damage)
-                attack_sound.play()
+                self.attack_sound.play()
                 return True
             else:
                 self.deactivate()
                 return False
 
+
+
+
     def in_range(self, enemy: entity.Enemy):
         enemy_x = enemy.position.x
         enemy_y = enemy.position.y
-        if abs(self.y - enemy_y) <= self.range and abs(self.x - enemy_x) <= self.range:
-            return True
-        else:
-            return False
+        return abs(self.y - enemy_y) <= self.range and abs(self.x - enemy_x) <= self.range
 
     def is_active(self):
         return self.active
 
     def deactivate(self):
-        self.active=False
+        self.active = False
 
 
 class Projectile():
