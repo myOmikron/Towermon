@@ -2,11 +2,11 @@ import time
 
 import pygame.mixer
 
-import entities.entity
 import settings
 from json_utils import json_parser as parser
-from entities import entity, tile
+from entities import entity
 from pygame import Surface
+from typing import Tuple
 
 
 class PokemonTower:
@@ -68,13 +68,13 @@ class PokemonTower:
 
 
 class Projectile():
-    def __init__(self, pos, enemy_pos, enemy):
+    def __init__(self, pos, enemy_pos, scale):
+        self.scale = scale
         self.pos = pos
         self.goal = enemy_pos
         self.radius = 3
         self.color = pygame.Color(255,0,0)
         self.path = self.calculate_points()
-        self.enemy = enemy
 
     def calculate_points(self):
         points = []
@@ -88,7 +88,7 @@ class Projectile():
         interval_y = delta_y / 30
         i = 0
         while i <= 30:
-            point = (round(x + interval_x * i), round(y + interval_y * i))
+            point = [x + interval_x * i, y + interval_y * i]
             points.append(point)
             i+=1
         return points
@@ -98,10 +98,13 @@ class Projectile():
             self.pos = self.path[0]
             self.path.pop(0)
 
+    def render(self, game_screen: Surface, offset: Tuple[int,int], scale: float):
+        if scale != self.scale:
+            for point in self.path:
+                point[0] = point[0] / self.scale * scale
+                point[1] = point[1] / self.scale * scale
+                self.scale = scale
+        dx,dy = (settings.TILE_SIZE/2 + offset[0]) *self.scale, (settings.TILE_SIZE/2 + offset[1]) *self.scale
+        pos = self.pos[0]+ dx, self.pos[1] + dy
+        pygame.draw.circle(game_screen, self.color,pos, self.radius)
 
-    def render(self, game_screen: Surface):
-        surface = Surface((5,5))
-        surface.fill((0,0,0))
-        surface.set_colorkey((0,0,0))
-        pygame.draw.circle(surface, self.color,(3,3), self.radius)
-        game_screen.blit(surface, self.pos)

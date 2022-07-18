@@ -58,6 +58,7 @@ class Map:
         self.scale = 0.9
         self.game_screen = game_screen
         self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT - settings.UI_HEIGHT))
+        #self.map_screen = pygame.Surface((game_screen.get_size()[0], game_screen.get_size()[1] - settings.UI_HEIGHT))
         self.grid = grid
         self.towers = dict()
         self.tiles = tiles
@@ -466,7 +467,7 @@ class Level:
                             enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
                             # create Projectile
-                            bullet = Projectile(pos, enemy_pos, enemy)
+                            bullet = Projectile(pos, enemy_pos, self.scale)
                             self.bullets.append(bullet)
                             # calculate coins
                             if enemy.life <= 0:
@@ -496,13 +497,13 @@ class Level:
         self.ui.render()
 
     def render_bullets(self):
-        for bullet in self.bullets:
+        for bullet in iter(self.bullets):
             if len(bullet.path) == 0:
                 self.bullets.remove(bullet)
             else:
                 i = 0
                 while len(bullet.path) > 0 and (i < 2):
-                    bullet.render(self.game_screen)
+                    bullet.render(self.game_screen, self.map.offset, self.map.scale)
                     bullet.move()
                     i += 1
 
@@ -511,8 +512,8 @@ class Level:
         # pos_x = (pixel_pos[0]) - self.scale * pokemon.range * settings.TILE_SIZE
         # pos_y = (pixel_pos[1]) - self.scale * pokemon.range * settings.TILE_SIZE
         # side = ((pokemon.range*2)+1) * self.scale * settings.TILE_SIZE
-        pos_x = pixel_pos[0] - 2
-        pos_y = pixel_pos[1] - 2
+        pos_x = pixel_pos[0] - 2 + self.scale*self.map.offset[0]
+        pos_y = pixel_pos[1] - 2+ self.scale*self.map.offset[1]
         side = self.scale * settings.TILE_SIZE + 4
         surface = Surface((side, side))
         surface.fill((0, 0, 0))
