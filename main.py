@@ -168,6 +168,10 @@ class Game:
                     counter = time.time_ns() + 100_000_000
 
             if self.level.game_over:
+                # Gameover Sound
+                pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
+                pg.mixer.music.play(-1, 0, 0)
+
                 self.playing = False
 
             # if settings.DEBUG:
@@ -294,6 +298,8 @@ class App:
                 self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
+                if self.game.level.game_over:
+                    self.menu = GameOverMenu(self)
                 self.playing = self.game.playing
 
 

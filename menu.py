@@ -6,6 +6,7 @@ from pygame.locals import *
 from pygame.font import Font
 from utils import image
 
+from entities.level import Level
 import json_utils.json_parser
 import settings
 
@@ -30,6 +31,7 @@ class Menu:
         pos_x = pos_x - 340
         pos_y = pos_y - 250
         self.pokeball = Pokeball(pos_x, pos_y)
+        self.level = Level.load_level("level_0.dat")
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -329,6 +331,25 @@ class CreditsMenu(Menu):
             self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 70)
             self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 90)
             self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 110)
+            self.blit_()
+
+
+class GameOverMenu(Menu):
+    def __init__(self, game):
+        Menu.__init__(self, game)
+
+    def display_menu(self):
+        self.show_display = True
+
+        while self.show_display:
+            self.app.check_events()
+            if self.app.START_KEY:
+                self.app.menu = self.app.main_menu
+                self.show_display = False
+            self.app.screen.fill((0, 0, 0))
+            self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 40)
+            self.draw_text(self.font_big, 'Score: ' + str(self.level.stage - 1), self.mid_w, self.mid_h)
+            self.draw_text(self.font, ' PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 30)
             self.blit_()
 
 class Pokeball():

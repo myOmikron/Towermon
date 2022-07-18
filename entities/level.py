@@ -495,6 +495,12 @@ class Level:
         self.hud.render(1)
         self.ui.render()
 
+        # render score
+        font = pygame.font.SysFont("Arial", 30, bold=True)
+        score = str(self.stage)
+        score_t = font.render('Wave: ' + score, True, pygame.Color("Black"))
+        pygame.display.get_surface().blit(score_t, (0, 30))
+
     def render_bullets(self):
         for bullet in iter(self.bullets):
             if len(bullet.path) == 0:
