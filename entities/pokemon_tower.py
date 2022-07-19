@@ -37,7 +37,6 @@ class PokemonTower:
 
     # Greift einen Feind an, und zieht im Lebenspunkte ab
     def attack(self, enemy: entity.Enemy):
-        attack_sound = pygame.mixer.Sound('assets/audio/click.wav')
         current_time = time.time_ns()
         if abs(current_time - self.last_attack) > (1 / self.rate) * 1000000000:
             if self.in_range(enemy) and enemy.life > 0:

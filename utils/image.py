@@ -6,6 +6,7 @@ import pygame
 from numpy.typing import NDArray
 
 
+
 def load_png(name) -> pygame.Surface:
     """Loads an image from the assets
 
@@ -47,8 +48,6 @@ def load_tile_map(name: str, tile_dim: Tuple[int, int]) -> NDArray[NDArray[pygam
         x = 0
         y += tile_dim[1]
     return array
-
-
 
 if __name__ == "__main__":
     pygame.mixer.pre_init(44100, 16, 2, 4096)
