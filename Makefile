@@ -20,7 +20,7 @@ build:
 	chmod +x ${BUILD_DIR}/appimagetool-*.AppImage
 	rm ${BUILD_DIR}/squashfs-root/*.desktop
 	cp Game.desktop ${BUILD_DIR}/squashfs-root/
-	cp assets/favicon.png ${BUILD_DIR}/squashfs-root/game.png
+	cp assets/graphics/favicon.png ${BUILD_DIR}/squashfs-root/game.png
 	cp game.sh ${BUILD_DIR}/squashfs-root/AppRun
 	chmod +x ${BUILD_DIR}/squashfs-root/AppRun
 	mkdir -p ${BUILD_DIR}/squashfs-root/opt/Game/
@@ -29,7 +29,6 @@ build:
 	cp -r data/* ${BUILD_DIR}/squashfs-root/opt/Game/data/
 	cp -r entities/* ${BUILD_DIR}/squashfs-root/opt/Game/entities/
 	cp -r json_utils/* ${BUILD_DIR}/squashfs-root/opt/Game/json_utils/
-	cp -r Sounds/* ${BUILD_DIR}/squashfs-root/opt/Game/Sounds/
 	cp -r utils/* ${BUILD_DIR}/squashfs-root/opt/Game/utils/
 	cp level_0.dat ${BUILD_DIR}/squashfs-root/opt/Game/
 	cp main.py ${BUILD_DIR}/squashfs-root/opt/Game/
