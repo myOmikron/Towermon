@@ -370,15 +370,16 @@ class Pokeball():
         self.x = x - 15
         self.y = y
         self.direction = 'up'
-        self.vel = 7  #Velosity
+        self.vel = 7  #Velocity
         self.min_y = y - 20 #Pokeball fits neatly in professors hand
         self.acc = 0.15 #Acceleration for gravity
+        self.ball_surf = self.draw_ball()
 
     def move(self):
         if self.direction == 'up':
             self.vel -= self.acc # slow down
             self.y -= self.vel #move up
-            if self.vel <= 0: # wenn pokeball has slowed down until turning point
+            if self.vel <= 0: # when pokeball has slowed down until turning point
                 self.direction = 'down'
         if self.direction == 'down':
             self.vel += self.acc #speed up
@@ -388,9 +389,29 @@ class Pokeball():
                 self.y += self.vel # move down
 
     def render_ball(self, screen):
-        ball_img = image.load_png('pokeball.png')
-        ball_img = pg.transform.scale(ball_img, (30,30))
-        screen.blit(ball_img, (self.x, self.y))
+        screen.blit(self.ball_surf, (self.x, self.y))
+
+    def draw_ball(self):
+        radius = 15
+        light = image.load_png('light.png')
+        light = pg.transform.scale(light, (radius, radius))
+        ball_surf = pg.Surface((radius * 2, radius * 2))
+        ball_surf.fill((0, 255, 0))
+        ball_surf.set_colorkey((0, 255, 0))
+        center = ball_surf.get_width() / 2
+        pg.draw.circle(ball_surf, (244, 41, 44), (center, center), radius, draw_top_right=True, draw_top_left=True)  # roter halbkreis
+        pg.draw.circle(ball_surf, (255, 255, 255), (center, center), radius, draw_bottom_right=True, draw_bottom_left=True)  # weißer halbkreis
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center), radius, width=1)  # schwarzer rahmen
+        pg.draw.circle(ball_surf, (255, 255, 255), (center, center + 1), radius / 3 + 1)  # kleiner weißer kreis
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center + 1), radius / 3 + 1,  width=2)  # kleiner kreis, rahmen
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center + 1), radius / 5, width=1)  # kleinster kreis
+        pg.draw.line(ball_surf, (0, 0, 0), (center - radius, center), (center - radius / 3, center), width=2)  # mittellinie links
+        pg.draw.line(ball_surf, (0, 0, 0), (center + radius / 3, center), (2 * radius, center), width=2)  # mittellinie rechts
+        ball_surf.blit(light, (0, 0))  # licht
+        return ball_surf
+
+
+
 
 
 

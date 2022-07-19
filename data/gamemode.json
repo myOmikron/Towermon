@@ -2,21 +2,21 @@
   "Trainer": {
     "coins": 5000,
     "timer": 30,
-    "enemy_life": 20
+    "enemy_life": 50
   },
   "Gym Leader": {
     "coins": 2000,
     "timer": 25,
-    "enemy_life": 25
+    "enemy_life": 60
   },
   "Elite Four": {
     "coins": 1000,
     "timer": 15,
-    "enemy_life": 30
+    "enemy_life": 70
   },
   "Champ": {
     "coins": 750,
     "timer": 5,
-    "enemy_life": 35
+    "enemy_life": 80
   }
 }
