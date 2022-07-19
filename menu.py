@@ -129,6 +129,7 @@ class MainMenu(Menu):
 
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
+            self.draw_text(self.font, 'USE ARROW KEYS TO NAVIGATE OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Start Game', self.startx, self.starty)
             self.draw_text(self.font, f'<Mode: {self.difficulties[self.difficulty]}>', self.difficultyx, self.difficultyy)
@@ -236,6 +237,7 @@ class OptionsMenu(Menu):
             self.draw_text(self.font_big, 'Options', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Volume', self.volx, self.voly)
             self.draw_text(self.font, 'Controls', self.controlsx, self.controlsy)
+            self.draw_text(self.font, ' PRESS BACKSPACE TO GO BACK OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
             self.draw_cursor()
             self.blit_()
 
@@ -277,6 +279,7 @@ class VolumeMenu(Menu):
             self.draw_background()
             self.draw_text(self.font_big, 'Volume', self.mid_w, self.mid_h-40)
             self.draw_text(self.font, self.message, self.mid_w, self.mid_h)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             self.blit_()
 
     def check_input(self):
@@ -292,7 +295,7 @@ class ControlsMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
-        # Todo
+
 
     def display_menu(self):
         self.show_display = True
@@ -302,6 +305,11 @@ class ControlsMenu(Menu):
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
             self.draw_text(self.font_big, 'Controls', self.mid_w, self.mid_h - 40)
+            self.draw_text(self.font, 'LEFT MOUSECLICK  to place towers', self.mid_w, self.mid_h + 10)
+            self.draw_text(self.font, 'W, A, S, D  to move through the map', self.mid_w, self.mid_h + 40)
+            self.draw_text(self.font, 'MOUSEWHEEL  to zoom in and out', self.mid_w, self.mid_h + 70)
+            self.draw_text(self.font, 'ESC  to leave the game', self.mid_w, self.mid_h + 100)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             # self.draw_cursor()
             self.blit_()
 
@@ -320,7 +328,7 @@ class CreditsMenu(Menu):
 
         while self.show_display:
             self.app.check_events()
-            if self.app.START_KEY or self.app.BACK_KEY:
+            if self.app.BACK_KEY:
                 self.app.menu = self.app.main_menu
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
@@ -331,6 +339,7 @@ class CreditsMenu(Menu):
             self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 80)
             self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 110)
             self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 140)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             self.blit_()
 
 
@@ -353,7 +362,7 @@ class GameOverMenu(Menu):
             self.app.screen.fill((0, 0, 0))
             self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 50)
             self.draw_text(self.font, 'Score: ' + str(self.stage - 1), self.mid_w, self.mid_h + 20)
-            self.draw_text(self.font, ' PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 400)
+            self.draw_text(self.font, 'PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 400)
             self.blit_()
 
 class Pokeball():
