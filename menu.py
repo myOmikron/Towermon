@@ -336,7 +336,7 @@ class Pokeball():
         self.x = x - 15
         self.y = y
         self.direction = 'up'
-        self.vel = 7  #Velosity
+        self.vel = 7  #Velocity
         self.min_y = y - 20 #Pokeball fits neatly in professors hand
         self.acc = 0.15 #Acceleration for gravity
 
@@ -344,7 +344,7 @@ class Pokeball():
         if self.direction == 'up':
             self.vel -= self.acc # slow down
             self.y -= self.vel #move up
-            if self.vel <= 0: # wenn pokeball has slowed down until turning point
+            if self.vel <= 0: # when pokeball has slowed down until turning point
                 self.direction = 'down'
         if self.direction == 'down':
             self.vel += self.acc #speed up
@@ -357,6 +357,8 @@ class Pokeball():
         ball_img = image.load_png('pokeball.png')
         ball_img = pg.transform.scale(ball_img, (30,30))
         screen.blit(ball_img, (self.x, self.y))
+
+
 
 
 
