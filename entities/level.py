@@ -3,10 +3,13 @@ import random
 from typing import Tuple, List, Union
 
 import numpy as np
+from sklearn.neighbors import KDTree
+from sklearn.metrics import DistanceMetric
 import pygame
 from numpy.typing import NDArray
 from pygame.sprite import AbstractGroup
 from pygame.surface import SurfaceType, Surface
+
 
 import settings
 import utils
@@ -16,7 +19,6 @@ from entities.navigation.a_star import AStar
 from entities.navigation.nav_mesh import NavMesh
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
-from entities.pokemon_tower import PokemonTower
 from entities.ui.button import ButtonGrid, Button, generate_all_buttons
 from entities.ui.health_bar import HealthBar
 from entities.ui.hud import HUD
@@ -458,10 +460,16 @@ class Level:
         for spawner in self.spawners:
             spawner.update_spawn(delta_time, self.spawn_frequenz)
             spawner.update(delta_time)
-            for pokemon in self.map.towers.values():
-                for spawner in self.spawners:
-                    for enemy in spawner.on_the_way:
-                        if pokemon.attack(enemy):
+            if len(spawner.on_the_way) >= 1:
+                kdtree = KDTree(np.array([(e.position.x, e.position.y) for e in spawner.on_the_way]),
+                                metric=DistanceMetric.get_metric('euclidean'))
+                for pokemon in self.map.towers.values():
+                    if pokemon.can_attack():
+                        results = kdtree.query_radius(np.array([(pokemon.x, pokemon.y)]), pokemon.range)[0]
+                        if results.shape[0] >= 1:
+                            index = results[0]
+                            enemy = spawner.on_the_way[index]
+                            pokemon.attack(enemy)
                             # Get Pixel coordinates
                             enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)

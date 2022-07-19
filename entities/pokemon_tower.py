@@ -35,25 +35,22 @@ class PokemonTower:
         self.rate += 1
         self.cost = self.cost + (2 * self.level)
 
-    # Greift einen Feind an, und zieht im Lebenspunkte ab
-    def attack(self, enemy: entity.Enemy):
-        attack_sound = pygame.mixer.Sound('assets/audio/click.wav')
+    def can_attack(self):
         current_time = time.time_ns()
         if abs(current_time - self.last_attack) > (1 / self.rate) * 1000000000:
-            if self.in_range(enemy) and enemy.life > 0:
-                self.active = True
-                self.last_attack = time.time_ns()
-                factor = parser.get_damage_factor(self.type, enemy.type)
-                damage = self.level * factor
-                enemy.take_life(damage)
-                self.attack_sound.play()
-                return True
-            else:
-                self.deactivate()
-                return False
+            self.last_attack = time.time_ns()
+            return True
+        self.deactivate()
+        return False
 
-
-
+    # Greift einen Feind an, und zieht im Lebenspunkte ab
+    def attack(self, enemy: entity.Enemy):
+        self.active = True
+        self.last_attack = time.time_ns()
+        factor = parser.get_damage_factor(self.type, enemy.type)
+        damage = self.level * factor
+        enemy.take_life(damage)
+        self.attack_sound.play()
 
     def in_range(self, enemy: entity.Enemy):
         enemy_x = enemy.position.x
@@ -106,5 +103,5 @@ class Projectile():
                 self.scale = scale
         dx, dy = offset[0] * self.scale * settings.TILE_SIZE, offset[1] * self.scale * settings.TILE_SIZE
         pos = self.pos[0] - dx, self.pos[1] - dy
-        game_screen.blit(self.img,pos)
-        #pygame.draw.circle(game_screen, self.color, pos, self.radius)
+        game_screen.blit(self.img, pos)
+        # pygame.draw.circle(game_screen, self.color, pos, self.radius)
