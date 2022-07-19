@@ -223,7 +223,7 @@ class Level:
         buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
 
         # self.health_bar = HealthBar(200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
-        self.hud = HUD(game_screen, (settings.SCREEN_WIDTH - 448, 10))
+        self.hud = HUD(game_screen, (self.game_screen.get_width() - 448, 10))
 
         self.ui = ButtonGrid(self.game_screen.get_width(), settings.UI_HEIGHT,
                              (0, self.game_screen.get_height() - settings.UI_HEIGHT), buttons, game_screen)
