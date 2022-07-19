@@ -39,14 +39,14 @@ class Game:
     def create_playlist():
         playlist = []
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 1.mid')
-            playlist.append('assets/audio/Route 1.mid')
+            playlist.append('assets/audio/Route 1.wav')
+            playlist.append('assets/audio/Route 1.wav')
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 2.mid')
-            playlist.append('assets/audio/Route 2.mid')
+            playlist.append('assets/audio/Route 2.wav')
+            playlist.append('assets/audio/Route 2.wav')
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 3.mid')
-            playlist.append('assets/audio/Route 3.mid')
+            playlist.append('assets/audio/Route 3.wav')
+            playlist.append('assets/audio/Route 3.wav')
         return playlist
 
     def run(self):
