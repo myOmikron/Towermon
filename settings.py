@@ -1,20 +1,19 @@
-SCREEN_WIDTH = 2560
-SCREEN_HEIGHT = 1440
-
 UI_HEIGHT = 150
 
 FPS_LOCK = 60
 
 TILE_SIZE = 64
 
+MAGIC_NUMBER = 0.04
+
 NEIGHBOURS = [(0, 1), (1, 0), (-1, 0), (0, -1)]  # (-1, 1), (1, -1), (1, 1), (-1, -1)
 
 ENEMY_LIFE = 20
-DEBUG = False
+DEBUG = True
 
-TIMER = 30
+TIMER = 5
 
-COINS = 5000
+COINS = 50
 
 MAP_TYPE_TO_INDEX = {
     "normal": 0,

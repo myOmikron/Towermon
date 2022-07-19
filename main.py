@@ -19,7 +19,7 @@ class Game:
     def __init__(self, screen: pg.SurfaceType):
         # Set Keys on default for menu actions
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
-        self.clock = pg.time.Clock()
+        self.clock = pygame.time.Clock()
         self.screen = screen
         # Set running and playing variables
         self.playing = False
@@ -32,21 +32,21 @@ class Game:
         self.level = Level.load_level("level_0.dat")
         # self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
-        #if settings.DEBUG:
+        # if settings.DEBUG:
         #    self.test = Test(self.scale, self.level.map.grid)
 
     @staticmethod
     def create_playlist():
         playlist = []
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 1.mid')
-            playlist.append('assets/audio/Route 1.mid')
+            playlist.append('assets/audio/Route 1.wav')
+            playlist.append('assets/audio/Route 1.wav')
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 2.mid')
-            playlist.append('assets/audio/Route 2.mid')
+            playlist.append('assets/audio/Route 2.wav')
+            playlist.append('assets/audio/Route 2.wav')
         if exists('assets/audio/Route 1.wav'):
-            playlist.append('assets/audio/Route 3.mid')
-            playlist.append('assets/audio/Route 3.mid')
+            playlist.append('assets/audio/Route 3.wav')
+            playlist.append('assets/audio/Route 3.wav')
         return playlist
 
     def run(self):
@@ -55,12 +55,13 @@ class Game:
         counter = 0
 
         trigger_rerender = False
+        min_fps, max_fps = 500, 0
         self.level.start(self.screen)
         self.level.render(self.scale, offset, trigger_rerender)
 
         self.playlist = self.create_playlist()
         soundtrack = pygame.mixer.music.load(self.playlist[0])
-        pygame.mixer.music.play(1,0,500)
+        pygame.mixer.music.play(1, 0, 500)
         self.playlist.pop(0)
         pygame.mixer.music.queue(self.playlist[0])
         self.playlist.pop(0)
@@ -83,7 +84,7 @@ class Game:
                     if len(self.playlist) == 0:
                         self.playlist = self.create_playlist()
                         pygame.mixer.music.load(self.playlist[0])
-                        pygame.mixer.music.play(1,0,500)
+                        pygame.mixer.music.play(1, 0, 500)
                         self.playlist.pop(0)
                     if len(self.playlist) > 0:
                         pygame.mixer.music.queue(self.playlist[0])
@@ -113,7 +114,7 @@ class Game:
                         move_south = event.type == pygame.KEYDOWN
                     # if event.key == pygame.K_q and event.type == pygame.KEYDOWN:
                     #    self.level.level_spawn()
-                    #if settings.DEBUG:
+                    # if settings.DEBUG:
                     #    if event.key == pygame.K_q:
                     #        if event.type == pygame.KEYDOWN:
                     #            self.test.set_start(*pygame.mouse.get_pos(), scale=self.scale)
@@ -133,8 +134,10 @@ class Game:
                     # Only move if the opposite direction is not pressed
                     if not move_west:
                         new_x = offset[0] + 1
-                        if new_x > self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE):
-                            new_x = self.level.map.width - 2 - self.screen.get_width() // (self.scale * settings.TILE_SIZE)
+                        if new_x > self.level.map.width - 2 - self.screen.get_width() // (
+                                self.scale * settings.TILE_SIZE):
+                            new_x = self.level.map.width - 2 - self.screen.get_width() // (
+                                        self.scale * settings.TILE_SIZE)
                         if new_x < 0:
                             new_x = 0
                         offset = int(new_x), offset[1]
@@ -155,14 +158,20 @@ class Game:
                         counter = time.time_ns() + 100_000_000
                 elif move_south:
                     new_y = offset[1] + 1
-                    if new_y > self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE):
-                        new_y = self.level.map.height - 1 - self.screen.get_height() // (self.scale * settings.TILE_SIZE)
+                    if new_y > self.level.map.height - 1 - self.screen.get_height() // (
+                            self.scale * settings.TILE_SIZE):
+                        new_y = self.level.map.height - 1 - self.screen.get_height() // (
+                                    self.scale * settings.TILE_SIZE)
                     if new_y < 0:
                         new_y = 0
                     offset = offset[0], int(new_y)
                     counter = time.time_ns() + 100_000_000
 
             if self.level.game_over:
+                # Gameover Sound
+                pg.mixer.music.load('assets/audio/Voltorb Flip win.ogg')
+                pg.mixer.music.play(0, 0, 0)
+
                 self.playing = False
 
             # if settings.DEBUG:
@@ -178,13 +187,17 @@ class Game:
             # Render player
             # self.player.render(time_delta, self.scale)
 
-            fps = str(int(self.clock.get_fps()))
-            fps_t = self.font.render(fps, True, pygame.Color("RED"))
+            fps = int(self.clock.get_fps())
+            min_fps = min(min_fps, fps)
+            max_fps = max(max_fps, fps)
+            fps_t = self.font.render(str(fps), True, pygame.Color("RED"))
             pygame.display.get_surface().blit(fps_t, (0, 0))
 
             pygame.display.update()
 
             trigger_rerender = False
+
+        print(f"max fps: {max_fps}, min fps: {min_fps}")
 
 
 class App:
@@ -209,22 +222,22 @@ class App:
 
     def __init__(self):
         # Initialize the audio mixer
-        pg.mixer.pre_init(44100, 32, 2, 4096)
+        pygame.mixer.pre_init(44100, 32, 2, 4096)
         # Game init
-        pg.init()
+        pygame.init()
 
         # Set fullscreen && double buffering for performance improvement
-        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN | pg.DOUBLEBUF, 16)
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.DOUBLEBUF, 16)
 
-        pg.mixer.music.set_volume(0.1)
-        pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
-        pg.mixer.music.play(1, 0, 0)
+        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
+        pygame.mixer.music.play(1, 0, 0)
 
         # Set allowed events for performance improvement
-        pg.event.set_allowed([pg.QUIT, pg.KEYDOWN, pg.KEYUP])
+        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
-        pg.display.set_caption("Tower defense")
-        pg.display.set_icon(image.load_png("favicon.png"))
+        pygame.display.set_caption("Tower defense")
+        pygame.display.set_icon(image.load_png("favicon.png"))
 
         # Initialize menu objects
         self.main_menu = MainMenu(self)
@@ -236,40 +249,40 @@ class App:
         # set main_menu as current menu
         self.menu = self.main_menu
         self.font_name = "assets/Font/Gameplay.ttf"
-        self.click_sound = pg.mixer.Sound('assets/audio/click.wav')
-        
+        self.click_sound = pygame.mixer.Sound('assets/audio/click.wav')
+        self.game = Game(self.screen)
 
     def check_events(self):
-        for event in pg.event.get():
+        for event in pygame.event.get():
 
-            if event.type == pg.QUIT:
+            if event.type == pygame.QUIT:
                 self.running, self.playing = False, False
                 self.menu.run_display = False
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
                     self.START_KEY = True
-                if event.key == pg.K_BACKSPACE:
+                if event.key == pygame.K_BACKSPACE:
                     self.BACK_KEY = True
-                if event.key == pg.K_DOWN:
+                if event.key == pygame.K_DOWN:
                     self.DOWN_KEY = True
                     self.click_sound.play()
-                if event.key == pg.K_UP:
+                if event.key == pygame.K_UP:
                     self.UP_KEY = True
                     self.click_sound.play()
-                if event.key == pg.K_RIGHT:
+                if event.key == pygame.K_RIGHT:
                     self.RIGHT_KEY = True
                     self.click_sound.play()
-                if event.key == pg.K_LEFT:
+                if event.key == pygame.K_LEFT:
                     self.LEFT_KEY = True
                     self.click_sound.play()
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()
+                if event.key == pygame.K_ESCAPE and not self.game.level.game_over:
+                    pygame.quit()
                     sys.exit()
-            if event.type == pg.MOUSEBUTTONDOWN:
-                x,y = pg.mouse.get_pos()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
                 if x > 70 and x < 470 and y > 100 and y < 500:
-                    poke_sound = pg.mixer.Sound('assets/audio/CHARIZARD.ogg')
-                    pg.mixer.Sound.play(poke_sound)
+                    poke_sound = pygame.mixer.Sound('assets/audio/CHARIZARD.ogg')
+                    pygame.mixer.Sound.play(poke_sound)
 
     # help function for menu inputs
     def reset_keys(self):
@@ -280,13 +293,14 @@ class App:
         pg.mixer.music.play(-1, 0, 0)
         while self.running:
             self.menu.display_menu()
+            self.game = Game(self.screen)
             if self.playing:
-                self.game = Game(self.screen)
+                self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
+                if self.game.level.game_over:
+                    self.menu = GameOverMenu(self)
                 self.playing = self.game.playing
-
-
 
 
 if __name__ == '__main__':

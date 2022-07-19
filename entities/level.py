@@ -57,7 +57,7 @@ class Map:
         self.height = height
         self.scale = 0.9
         self.game_screen = game_screen
-        self.map_screen = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT - settings.UI_HEIGHT))
+        self.map_screen = pygame.Surface((self.game_screen.get_width(), self.game_screen.get_height() - settings.UI_HEIGHT))
         #self.map_screen = pygame.Surface((game_screen.get_size()[0], game_screen.get_size()[1] - settings.UI_HEIGHT))
         self.grid = grid
         self.towers = dict()
@@ -223,10 +223,10 @@ class Level:
         buttons = [Button(background, highlight) for background, highlight in generate_all_buttons()]
 
         # self.health_bar = HealthBar(200, 20, 100, (settings.SCREEN_WIDTH - 250, 50))
-        self.hud = HUD(game_screen, (settings.SCREEN_WIDTH - 448, 10))
+        self.hud = HUD(game_screen, (self.game_screen.get_width() - 448, 10))
 
-        self.ui = ButtonGrid(settings.SCREEN_WIDTH, settings.UI_HEIGHT,
-                             (0, settings.SCREEN_HEIGHT - settings.UI_HEIGHT), buttons, game_screen)
+        self.ui = ButtonGrid(self.game_screen.get_width(), settings.UI_HEIGHT,
+                             (0, self.game_screen.get_height() - settings.UI_HEIGHT), buttons, game_screen)
 
         enemy_factory = EnemyFactory(1)
         self.nav_mesh = NavMesh(width, height, map.grid)
@@ -249,7 +249,7 @@ class Level:
         :param screen: game screen
         :return:
         """
-        self.timer = Timer(settings.TIMER, Vector2(((settings.SCREEN_WIDTH // 2) - 100, 10)), screen)
+        self.timer = Timer(settings.TIMER, Vector2(((self.game_screen.get_width() // 2) - 100, 10)), screen)
         self.wallet = Wallet(settings.COINS, screen)
         self.hud.update_coins(self.wallet.coins)
 
@@ -389,7 +389,7 @@ class Level:
         :return:
         """
         x, y = position
-        if 0 <= x <= settings.SCREEN_WIDTH and 0 <= y <= settings.SCREEN_HEIGHT - settings.UI_HEIGHT:
+        if 0 <= x <= self.game_screen.get_width() and 0 <= y <= self.game_screen.get_height() - settings.UI_HEIGHT:
             x, y = Level._pixel_to_grid_coord(x, y, self.scale)
             x, y = x + offset[0], y + offset[1]
             if x < self.map.width and y < self.map.height:
@@ -441,8 +441,8 @@ class Level:
         :return:
         """
 
-        # if not self.health_bar.alive:
-        #    self.game_over = True
+        if not self.hud.health_bar.alive:
+            self.game_over = True
 
         if self.timer.finished and self.wave_done:
             self.update_stage()
@@ -494,6 +494,20 @@ class Level:
         self.hud.update_coins(self.wallet.coins)
         self.hud.render(1)
         self.ui.render()
+        
+        # render score
+        font = pygame.font.SysFont("Arial", 35, bold=True)
+        font2 = pygame.font.SysFont("Arial", 20, bold=False)
+        score = str(self.stage)
+        score_t = font.render('Wave: ' + score, True, pygame.Color("Black"))
+        remaining_enemies = len(spawner.on_the_way)
+        remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
+        pygame.display.get_surface().blit(score_t, (self.game_screen.get_width() - 240 , 160))
+        if remaining_enemies == 0:
+            remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
+        else:
+            remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color("Black"))
+        pygame.display.get_surface().blit(remaining_enemies_t, (self.game_screen.get_width() - 240, 190))
 
     def render_bullets(self):
         for bullet in iter(self.bullets):

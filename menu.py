@@ -6,6 +6,7 @@ from pygame.locals import *
 from pygame.font import Font
 from utils import image
 
+from entities.level import Level
 import json_utils.json_parser
 import settings
 
@@ -30,6 +31,7 @@ class Menu:
         pos_x = pos_x - 340
         pos_y = pos_y - 250
         self.pokeball = Pokeball(pos_x, pos_y)
+        self.level = Level.load_level("level_0.dat")
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -127,6 +129,7 @@ class MainMenu(Menu):
 
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
+            self.draw_text(self.font, 'USE ARROW KEYS TO NAVIGATE OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Start Game', self.startx, self.starty)
             self.draw_text(self.font, f'<Mode: {self.difficulties[self.difficulty]}>', self.difficultyx, self.difficultyy)
@@ -234,6 +237,7 @@ class OptionsMenu(Menu):
             self.draw_text(self.font_big, 'Options', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Volume', self.volx, self.voly)
             self.draw_text(self.font, 'Controls', self.controlsx, self.controlsy)
+            self.draw_text(self.font, ' PRESS BACKSPACE TO GO BACK OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
             self.draw_cursor()
             self.blit_()
 
@@ -275,6 +279,7 @@ class VolumeMenu(Menu):
             self.draw_background()
             self.draw_text(self.font_big, 'Volume', self.mid_w, self.mid_h-40)
             self.draw_text(self.font, self.message, self.mid_w, self.mid_h)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             self.blit_()
 
     def check_input(self):
@@ -290,7 +295,7 @@ class ControlsMenu(Menu):
 
     def __init__(self, game):
         Menu.__init__(self, game)
-        # Todo
+
 
     def display_menu(self):
         self.show_display = True
@@ -300,6 +305,11 @@ class ControlsMenu(Menu):
             self.app.screen.fill((0, 0, 0))
             self.draw_background()
             self.draw_text(self.font_big, 'Controls', self.mid_w, self.mid_h - 40)
+            self.draw_text(self.font, 'LEFT MOUSECLICK  to place towers', self.mid_w, self.mid_h + 10)
+            self.draw_text(self.font, 'W, A, S, D  to move through the map', self.mid_w, self.mid_h + 40)
+            self.draw_text(self.font, 'MOUSEWHEEL  to zoom in and out', self.mid_w, self.mid_h + 70)
+            self.draw_text(self.font, 'ESC  to leave the game', self.mid_w, self.mid_h + 100)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             # self.draw_cursor()
             self.blit_()
 
@@ -318,7 +328,7 @@ class CreditsMenu(Menu):
 
         while self.show_display:
             self.app.check_events()
-            if self.app.START_KEY or self.app.BACK_KEY:
+            if self.app.BACK_KEY:
                 self.app.menu = self.app.main_menu
                 self.show_display = False
             self.app.screen.fill((0, 0, 0))
@@ -326,9 +336,33 @@ class CreditsMenu(Menu):
             self.draw_text(self.font_big, 'Credits', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Made by', self.mid_w, self.mid_h + 10)
             self.draw_text(self.font,'Lukas Mahr', self.mid_w, self.mid_h + 50)
-            self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 70)
-            self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 90)
-            self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 110)
+            self.draw_text(self.font,'Niklas Pfister', self.mid_w, self.mid_h + 80)
+            self.draw_text(self.font,'Veronika Landerer', self.mid_w, self.mid_h + 110)
+            self.draw_text(self.font,'Julian Markovic', self.mid_w, self.mid_h + 140)
+            self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
+            self.blit_()
+
+
+class GameOverMenu(Menu):
+    def __init__(self, game):
+        Menu.__init__(self, game)
+        self.game = self.app.game
+        self.stage = self.game.level.stage
+
+    def display_menu(self):
+        self.show_display = True
+
+        while self.show_display:
+            self.app.check_events()
+            if self.app.START_KEY:
+                self.app.menu = self.app.main_menu
+                pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
+                pg.mixer.music.play(0, 0, 0)
+                self.show_display = False
+            self.app.screen.fill((0, 0, 0))
+            self.draw_text(self.font_big, 'Game over', self.mid_w, self.mid_h - 50)
+            self.draw_text(self.font, 'Score: ' + str(self.stage - 1), self.mid_w, self.mid_h + 20)
+            self.draw_text(self.font, 'PRESS ENTER TO RETURN TO MAIN MENU', self.mid_w, self.mid_h + 400)
             self.blit_()
 
 class Pokeball():
@@ -339,6 +373,7 @@ class Pokeball():
         self.vel = 7  #Velocity
         self.min_y = y - 20 #Pokeball fits neatly in professors hand
         self.acc = 0.15 #Acceleration for gravity
+        self.ball_surf = self.draw_ball()
 
     def move(self):
         if self.direction == 'up':
@@ -354,9 +389,27 @@ class Pokeball():
                 self.y += self.vel # move down
 
     def render_ball(self, screen):
-        ball_img = image.load_png('pokeball.png')
-        ball_img = pg.transform.scale(ball_img, (30,30))
-        screen.blit(ball_img, (self.x, self.y))
+        screen.blit(self.ball_surf, (self.x, self.y))
+
+    def draw_ball(self):
+        radius = 15
+        light = image.load_png('light.png')
+        light = pg.transform.scale(light, (radius, radius))
+        ball_surf = pg.Surface((radius * 2, radius * 2))
+        ball_surf.fill((0, 255, 0))
+        ball_surf.set_colorkey((0, 255, 0))
+        center = ball_surf.get_width() / 2
+        pg.draw.circle(ball_surf, (244, 41, 44), (center, center), radius, draw_top_right=True, draw_top_left=True)  # roter halbkreis
+        pg.draw.circle(ball_surf, (255, 255, 255), (center, center), radius, draw_bottom_right=True, draw_bottom_left=True)  # weißer halbkreis
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center), radius, width=1)  # schwarzer rahmen
+        pg.draw.circle(ball_surf, (255, 255, 255), (center, center + 1), radius / 3 + 1)  # kleiner weißer kreis
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center + 1), radius / 3 + 1,  width=2)  # kleiner kreis, rahmen
+        pg.draw.circle(ball_surf, (0, 0, 0), (center, center + 1), radius / 5, width=1)  # kleinster kreis
+        pg.draw.line(ball_surf, (0, 0, 0), (center - radius, center), (center - radius / 3, center), width=2)  # mittellinie links
+        pg.draw.line(ball_surf, (0, 0, 0), (center + radius / 3, center), (2 * radius, center), width=2)  # mittellinie rechts
+        ball_surf.blit(light, (0, 0))  # licht
+        return ball_surf
+
 
 
 
