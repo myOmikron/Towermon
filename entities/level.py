@@ -502,12 +502,12 @@ class Level:
         score_t = font.render('Wave: ' + score, True, pygame.Color("Black"))
         remaining_enemies = len(spawner.on_the_way)
         remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
-        pygame.display.get_surface().blit(score_t, (0, 60))
+        pygame.display.get_surface().blit(score_t, (self.game_screen.get_width() - 240 , 160))
         if remaining_enemies == 0:
             remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
         else:
             remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color("Black"))
-        pygame.display.get_surface().blit(remaining_enemies_t, (0, 90))
+        pygame.display.get_surface().blit(remaining_enemies_t, (self.game_screen.get_width() - 240, 190))
 
     def render_bullets(self):
         for bullet in iter(self.bullets):
