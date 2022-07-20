@@ -52,6 +52,7 @@ class Map:
     target: Vector2
     high_light: Surface
     pokemon_imgs: dict
+    sprites = dict
     """Map for the Level"""
 
     def __init__(self, width, height, game_screen, grid, tiles, spawns, target):
@@ -67,8 +68,8 @@ class Map:
         self.spawns = spawns
         self.target = target
         self.high_light = utils.image.load_png("highlight.png")
-        self.pokemon_imgs = self.load_imgs()
         self.offset = (0, 0)
+        self.sprites = image.create_sprites()
 
     def add_tile(self, tile: Tile, position: Vector2):
         """
@@ -80,16 +81,10 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile_from_grid((int(position.x), int(position.y)))
 
-    @staticmethod
-    def load_imgs():
-        img_dict = dict()
-        for pokemon in json_parser.get_pokemon_list():
-            img_dict[pokemon] = utils.image.load_png(pokemon + '.png')
-        return img_dict
 
     def _render_tower(self, position: Tuple[int, int], offset: Tuple[int, int]):
         tower = self.towers[(position[0] + offset[0], position[1] + offset[1])]
-        img = self.pokemon_imgs[tower.name]
+        img = self.sprites[tower.name+'.png']
         self._render_tile(img, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int], offset: Tuple[int, int]):
@@ -211,6 +206,7 @@ class Level:
     game_screen: SurfaceType
     nav_mesh: NavMesh
     bullets: [Projectile]
+    sprites: dict
 
     def __init__(self, width: int, height: int, game_screen: SurfaceType, map: Map, *groups: AbstractGroup):
         self.scale = 0.9
@@ -493,10 +489,11 @@ class Level:
             if pokemon.is_active():
                 self.render_attack(pokemon)
 
-        self.render_bullets()
+
         for spawner in self.spawners:
             spawner.render(scale, offset)
             # self.render_path(spawner.path, scale)
+        self.render_bullets()
         self.timer.render(scale)
         # self.health_bar.render(1)
         self.hud.update_coins(self.wallet.coins)
@@ -522,7 +519,7 @@ class Level:
             if len(bullet.path) == 0:
                 self.bullets.remove(bullet)
             else:
-                bullet.render(self.game_screen, self.map.offset, self.map.scale)
+                bullet.render_projectile(self.game_screen, self.sprites['shoot.png'], self.map.offset, self.map.scale)
                 bullet.move()
 
     def render_attack(self, pokemon: PokemonTower):

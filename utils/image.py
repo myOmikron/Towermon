@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 import pygame
 from numpy.typing import NDArray
-
+from json_utils import json_parser
 
 
 def load_png(name) -> pygame.Surface:
@@ -48,6 +48,17 @@ def load_tile_map(name: str, tile_dim: Tuple[int, int]) -> NDArray[NDArray[pygam
         x = 0
         y += tile_dim[1]
     return array
+
+
+def create_sprites() -> dict:
+    sprites = {
+        'light.png': load_png('light.png'),
+        'shoot.png': load_png('shoot.png')
+    }
+    for pokemon in json_parser.get_pokemon_list():
+        sprites[pokemon+'.png'] = load_png(pokemon + '.png')
+    return sprites
+
 
 if __name__ == "__main__":
     pygame.mixer.pre_init(44100, 16, 2, 4096)

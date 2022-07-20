@@ -14,7 +14,7 @@ from utils.transform import rot_center
 
 class Sprite(pygame.sprite.Sprite):
     """
-    Generic Sprit Class for Pygame Surface
+    Generic Sprite Class for Pygame Surface
     """
 
     def __init__(self, screen: SurfaceType, image: Surface, position: Vector2, angle: float = 0, scale: float = 1):
