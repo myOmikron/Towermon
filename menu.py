@@ -32,6 +32,15 @@ class Menu:
         pos_y = pos_y - 250
         self.pokeball = Pokeball(pos_x, pos_y)
         self.level = Level.load_level("level_0.dat")
+        self.current_text = 0
+        self.intro_text = ['Hello there! Welcome to the world of Pokémon!','Press (a) to continue.',
+                      'Use the arrow keys to navigate through the menu,','press Enter to select an option or to start the game',
+                      'Before starting a new game, select a mode!','It sets the difficulty.', 'To go back to the main menu, press Backspace.', 'To quit, press the Esc key.',
+                      'A description of the game controls can be found in the', ' "Options" menu.','Try clicking on Charizard  ;-)', ' Have fun!']
+        frame = image.load_png('speech_frame.png')
+        self.frame = pg.transform.scale(frame, (800, 200))
+        self.frame.set_colorkey((255,0,0))
+
 
     def draw_text(self, font: Font, text: str, pos_x: int, pos_y: int) -> None:
         text_surface = font.render(text, True, (255, 255, 255))
@@ -90,17 +99,15 @@ class Menu:
         self.pokeball.render_ball(self.app.screen)
         self.pokeball.move()
 
-'''
-    def create_dropdown(self) -> Dropdown:
-        screen = self.app.screen
-        x = self.mid_w - 50
-        y = self.mid_h + 130
-        width = 100
-        height = 50
-        choices = ["easy", "medium", "hard", "insane"]
-        dropdown = Dropdown(screen,x,y,width,height,'Select Diffculty', choices, borderRadius=3, colour=pg.Color('grey'),  direction='down', textHAlign='left')
-        return dropdown
-'''
+    def draw_textbox(self):
+        box_x, box_y = self.x/2-400, self.y-250
+        text_surface1 = self.font.render(self.intro_text[self.current_text], True, (0, 0, 0))
+        text_surface2 = self.font.render(self.intro_text[self.current_text+1], True, (0, 0, 0))
+        self.app.screen.blit(self.frame, (box_x, box_y))
+        self.app.screen.blit(text_surface1, (box_x+100, box_y + 60))
+        self.app.screen.blit(text_surface2, (box_x+100, box_y+100))
+
+
 class MainMenu(Menu):
 
     def __init__(self, game):
@@ -126,10 +133,10 @@ class MainMenu(Menu):
             self.app.check_events()
             self.check_input()
             self.draw_background()
-
+            self.draw_textbox()
             if self.error != "":
                 self.draw_text(self.font, self.error, self.mid_w, self.mid_h - 150)
-            self.draw_text(self.font, 'USE ARROW KEYS TO NAVIGATE OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
+            #self.draw_text(self.font, 'USE ARROW KEYS TO NAVIGATE OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
             self.draw_text(self.font_big, 'Main Menu', self.mid_w, self.mid_h - 40)
             self.draw_text(self.font, 'Start Game', self.startx, self.starty)
             self.draw_text(self.font, f'<Mode: {self.difficulties[self.difficulty]}>', self.difficultyx, self.difficultyy)
@@ -137,7 +144,6 @@ class MainMenu(Menu):
             self.draw_text(self.font, 'Options', self.optionsx, self.optionsy)
             self.draw_text(self.font, 'Credits', self.creditsx, self.creditsy)
             self.draw_cursor()
-            #pygame_widgets.update(events)
             self.blit_()
 
 

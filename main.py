@@ -220,6 +220,7 @@ class App:
     START_KEY: bool = False
     BACK_KEY: bool = False
 
+
     def __init__(self):
         # Initialize the audio mixer
         pygame.mixer.pre_init(44100, 32, 2, 4096)
@@ -278,11 +279,19 @@ class App:
                 if event.key == pygame.K_ESCAPE and not self.game.level.game_over:
                     pygame.quit()
                     sys.exit()
+                if event.key == pygame.K_a:
+                    print(self.main_menu.current_text)
+                    if self.main_menu.current_text >= len(self.main_menu.intro_text)-2:
+                        self.main_menu.current_text = 0
+                    else: self.main_menu.current_text+= 2
+                    self.click_sound.play()
+                    self.main_menu.draw_textbox()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
                 if x > 70 and x < 470 and y > 100 and y < 500:
                     poke_sound = pygame.mixer.Sound('assets/audio/CHARIZARD.ogg')
                     pygame.mixer.Sound.play(poke_sound)
+
 
     # help function for menu inputs
     def reset_keys(self):
