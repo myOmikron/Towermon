@@ -23,15 +23,21 @@ class Game:
         self.screen = screen
         # Set running and playing variables
         self.playing = False
+        self.paused = False
         self.playlist = []
+
+
+
 
         # Fill screen black
         self.screen.fill((0, 0, 0))
 
         self.scale = 1
-        self.level = Level.load_level("level_0.dat")
+
         # self.player = Player("player.png", self.scale)
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
+        self.a = 0;
+
         # if settings.DEBUG:
         #    self.test = Test(self.scale, self.level.map.grid)
 
@@ -56,7 +62,12 @@ class Game:
 
         trigger_rerender = False
         min_fps, max_fps = 500, 0
-        self.level.start(self.screen)
+
+        while self.a < 1:
+            self.level = Level.load_level("level_0.dat")
+            self.level.start(self.screen)
+            self.a += 1
+
         self.level.render(self.scale, offset, trigger_rerender)
 
         self.playlist = self.create_playlist()
@@ -68,7 +79,7 @@ class Game:
         MUSIC_END = pygame.USEREVENT + 1
         pygame.mixer.music.set_endevent(MUSIC_END)
 
-        while self.playing:
+        while self.playing and not self.paused:
             # Trigger clock
             time_delta = self.clock.tick() / 1000
 
@@ -77,7 +88,7 @@ class Game:
                 if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.load('assets/audio/Ingido Plateau.wav')
                     pygame.mixer.music.play(-1, 0, 0)
-                    self.playing = False
+                    self.paused = True
 
                 # Handle Music Playlist
                 if event.type == MUSIC_END:
@@ -251,7 +262,9 @@ class App:
         self.menu = self.main_menu
         self.font_name = "assets/Font/Gameplay.ttf"
         self.click_sound = pygame.mixer.Sound('assets/audio/click.wav')
-        self.game = Game(self.screen)
+
+        self.paused = False
+        self.new_game = True
 
     def check_events(self):
         for event in pygame.event.get():
@@ -301,15 +314,21 @@ class App:
         pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
         pg.mixer.music.play(-1, 0, 0)
         while self.running:
+            if self.new_game:
+                self.game = Game(self.screen)
+                self.new_game = False
             self.menu.display_menu()
-            self.game = Game(self.screen)
+            self.game.paused = self.paused
             if self.playing:
                 self.game.clock = pygame.time.Clock()
                 self.game.playing = self.playing
                 self.game.run()
+                self.paused = self.game.paused
                 if self.game.level.game_over:
                     self.menu = GameOverMenu(self)
-                self.playing = self.game.playing
+                if self.paused:
+                    self.menu = ResumeMenu(self)
+                    self.playing = False
 
 
 if __name__ == '__main__':

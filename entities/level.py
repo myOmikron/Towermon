@@ -421,7 +421,7 @@ class Level:
         self.stage += 1
         self.spawn_frequenz = 1 / self.stage
         for spawner in self.spawners:
-            spawner.spawn(self.stage * 3)
+            spawner.spawn(self.stage * 10)
 
     def check_on_wave(self):
         """
@@ -474,7 +474,7 @@ class Level:
                             self.bullets.append(bullet)
                             # calculate coins
                             if enemy.life <= 0:
-                                self.wallet.coins += 150
+                                self.wallet.coins += 50
         self.timer.update(delta_time)
 
     def render(self, scale: float, offset: Tuple[int, int], trigger_rerender: bool) -> None:

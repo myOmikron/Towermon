@@ -348,6 +348,96 @@ class CreditsMenu(Menu):
             self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             self.blit_()
 
+class ResumeMenu(Menu):
+
+    def __init__(self, game):
+        Menu.__init__(self, game)
+        self.state = 'Start'
+
+        self.startx, self.starty = self.mid_w, self.mid_h + 10
+        self.difficultyx, self.difficultyy = self.mid_w, self.mid_h + 40
+        self.exitx, self.exity = self.mid_w, self.mid_h + 70
+        self.optionsx, self.optionsy = self.mid_w, self.mid_h + 100
+        self.creditsx, self.creditsy = self.mid_w, self.mid_h + 130
+
+        self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
+        #self.dropdown = self.create_dropdown()
+
+
+    def display_menu(self):
+        self.show_display = True
+
+        while self.show_display:
+            self.app.check_events()
+            self.check_input()
+            self.draw_background()
+
+            self.draw_text(self.font, 'USE ARROW KEYS TO NAVIGATE OR ENTER TO CHOOSE', self.mid_w, self.mid_h - 400)
+            self.draw_text(self.font_big, 'Game Paused', self.mid_w, self.mid_h - 40)
+            self.draw_text(self.font, 'Resume Game', self.startx, self.starty)
+            self.draw_text(self.font, 'New Game', self.difficultyx, self.difficultyy)
+            self.draw_text(self.font, 'Exit Game', self.exitx, self.exity)
+            self.draw_text(self.font, 'Options', self.optionsx, self.optionsy)
+            self.draw_text(self.font, 'Credits', self.creditsx, self.creditsy)
+            self.draw_cursor()
+            #pygame_widgets.update(events)
+            self.blit_()
+
+
+    def move_cursor(self):
+        if self.app.DOWN_KEY:
+            if self.state == 'Start':
+                self.cursor_rect.midtop = (self.difficultyx + self.offset, self.difficultyy)
+                self.state = 'Difficulty'
+            elif self.state == 'Difficulty':
+                self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
+                self.state = 'Exit'
+            elif self.state == 'Exit':
+                self.cursor_rect.midtop = (self.optionsx + self.offset, self.optionsy)
+                self.state = 'Options'
+            elif self.state == 'Options':
+                self.cursor_rect.midtop = (self.creditsx + self.offset, self.creditsy)
+                self.state = 'Credits'
+            elif self.state == 'Credits':
+                self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
+                self.state = 'Start'
+
+        elif self.app.UP_KEY:
+            if self.state == 'Start':
+                self.cursor_rect.midtop = (self.creditsx + self.offset, self.creditsy)
+                self.state = 'Credits'
+            elif self.state == 'Difficulty':
+                self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
+                self.state = 'Start'
+            elif self.state == 'Exit':
+                self.cursor_rect.midtop = (self.difficultyx + self.offset, self.difficultyy)
+                self.state = 'Difficulty'
+            elif self.state == 'Options':
+                self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
+                self.state = 'Exit'
+            elif self.state == 'Credits':
+                self.cursor_rect.midtop = (self.optionsx + self.offset, self.optionsy)
+                self.state = 'Options'
+
+    def check_input(self):
+        self.move_cursor()
+        if self.app.START_KEY:
+            if self.state == 'Start':
+                self.app.playing = True
+                self.app.paused = False
+            elif self.state == 'Difficulty':
+                self.app.new_game = True
+                self.app.menu = self.app.main_menu
+                self.app.paused = False
+            elif self.state == 'Options':
+                self.app.menu = self.app.options
+            elif self.state == 'Exit':
+                pg.quit()
+                sys.exit()
+            elif self.state == 'Credits':
+                self.app.menu = self.app.credits
+            self.show_display = False
+
 
 class GameOverMenu(Menu):
     def __init__(self, game):
@@ -361,6 +451,8 @@ class GameOverMenu(Menu):
         while self.show_display:
             self.app.check_events()
             if self.app.START_KEY:
+                self.app.new_game = True
+                self.app.playing = False
                 self.app.menu = self.app.main_menu
                 pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
                 pg.mixer.music.play(0, 0, 0)
