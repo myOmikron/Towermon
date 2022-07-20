@@ -436,6 +436,7 @@ class GameOverMenu(Menu):
             self.app.check_events()
             if self.app.START_KEY:
                 self.app.new_game = True
+                self.app.playing = False
                 self.app.menu = self.app.main_menu
                 pg.mixer.music.load('assets/audio/Ingido Plateau.wav')
                 pg.mixer.music.play(0, 0, 0)
