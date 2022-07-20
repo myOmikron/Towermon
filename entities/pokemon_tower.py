@@ -40,7 +40,7 @@ class PokemonTower:
         if abs(current_time - self.last_attack) > (1 / self.rate) * 1000000000:
             self.last_attack = time.time_ns()
             return True
-        self.deactivate()
+        #self.deactivate()
         return False
 
     # Greift einen Feind an, und zieht im Lebenspunkte ab
@@ -51,12 +51,12 @@ class PokemonTower:
         damage = self.level * factor
         enemy.take_life(damage)
         self.attack_sound.play()
-
+    '''
     def in_range(self, enemy: entity.Enemy):
         enemy_x = enemy.position.x
         enemy_y = enemy.position.y
         return abs(self.y - enemy_y) <= self.range and abs(self.x - enemy_x) <= self.range
-
+    '''
     def is_active(self):
         return self.active
 

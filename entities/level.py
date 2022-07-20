@@ -488,6 +488,8 @@ class Level:
         for pokemon in self.map.towers.values():
             if pokemon.is_active():
                 self.render_attack(pokemon)
+            if pokemon.can_attack(): #deactivate towers only if they are out of range. dont deactivate in waiting because of rate.
+                pokemon.deactivate()
 
 
         for spawner in self.spawners:
@@ -519,14 +521,15 @@ class Level:
             if len(bullet.path) == 0:
                 self.bullets.remove(bullet)
             else:
-                bullet.render_projectile(self.game_screen, self.sprites['shoot.png'], self.map.offset, self.map.scale)
+                bullet.render_projectile(self.game_screen, self.map.sprites['shoot.png'], self.map.offset, self.map.scale)
                 bullet.move()
+
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
         pos_x = pixel_pos[0] - 2 - self.map.offset[0] * settings.TILE_SIZE * self.scale
         pos_y = pixel_pos[1] - 2 - self.map.offset[1] * settings.TILE_SIZE * self.scale
         side = self.scale * settings.TILE_SIZE + 4
-        rect = pygame.Rect(pos_x, pos_y, side, side)
+        rect = pygame.Rect(pos_x, pos_y, side+4, side+4)
         pygame.draw.rect(self.map.game_screen, pygame.Color(255, 0, 0), rect, width=2)
 
