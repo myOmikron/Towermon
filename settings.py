@@ -36,3 +36,21 @@ MAP_TYPE_TO_INDEX = {
     "dark": 17,
     "fairy": 18
 }
+
+MAP_TYPE_TO_INDEX_PROJECTILES = {
+    "normal": 3,
+    "fighting": 13,
+    "flying": 11,
+    "poison": 2,
+    "ground": 12,
+    "rock": 8,
+    "bug": 9,
+    "ghost": 7,
+    "fire": 0,
+    "water": 4,
+    "grass": 14,
+    "electric": 5,
+    "psychic": 10,
+    "ice": 1,
+    "dragon": 6
+}

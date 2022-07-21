@@ -3,13 +3,12 @@ import random
 from typing import Tuple, List, Union
 
 import numpy as np
-from sklearn.neighbors import KDTree
-from sklearn.metrics import DistanceMetric
 import pygame
 from numpy.typing import NDArray
 from pygame.sprite import AbstractGroup
 from pygame.surface import SurfaceType, Surface
-
+from sklearn.metrics import DistanceMetric
+from sklearn.neighbors import KDTree
 
 import settings
 import utils
@@ -17,15 +16,15 @@ from entities.entity_factories import EnemyFactory
 from entities.navigation.Math.vector2 import Vector2
 from entities.navigation.a_star import AStar
 from entities.navigation.nav_mesh import NavMesh
+from entities.pokemon_tower import PokemonTower, Projectile
 from entities.spawners import EnemySpawner
 from entities.tile import Tile, TileType
 from entities.ui.button import ButtonGrid, Button, generate_all_buttons
 from entities.ui.health_bar import HealthBar
 from entities.ui.hud import HUD
 from entities.ui.wallet import Wallet
-from utils import image
 from json_utils import json_parser
-from entities.pokemon_tower import PokemonTower, Projectile
+from utils import image
 
 
 def generate_map(name, width, height):
@@ -60,8 +59,9 @@ class Map:
         self.height = height
         self.scale = 0.9
         self.game_screen = game_screen
-        self.map_screen = pygame.Surface((self.game_screen.get_width(), self.game_screen.get_height() - settings.UI_HEIGHT))
-        #self.map_screen = pygame.Surface((game_screen.get_size()[0], game_screen.get_size()[1] - settings.UI_HEIGHT))
+        self.map_screen = pygame.Surface(
+            (self.game_screen.get_width(), self.game_screen.get_height() - settings.UI_HEIGHT))
+        # self.map_screen = pygame.Surface((game_screen.get_size()[0], game_screen.get_size()[1] - settings.UI_HEIGHT))
         self.grid = grid
         self.towers = dict()
         self.tiles = tiles
@@ -81,10 +81,9 @@ class Map:
         self.grid[position.y][position.x] = tile
         self._render_tile_from_grid((int(position.x), int(position.y)))
 
-
     def _render_tower(self, position: Tuple[int, int], offset: Tuple[int, int]):
         tower = self.towers[(position[0] + offset[0], position[1] + offset[1])]
-        img = self.sprites[tower.name+'.png']
+        img = self.sprites[tower.name + '.png']
         self._render_tile(img, position)
 
     def _render_tile_from_grid(self, position: Tuple[int, int], offset: Tuple[int, int]):
@@ -198,7 +197,7 @@ class Level:
     wallet: Wallet
     wave_done: bool
     spawn_frequenz: float = 1
-    stage: int = 0
+    stage: int = 100
     health_bar: HealthBar
     game_over: bool
     ui: ButtonGrid
@@ -240,6 +239,8 @@ class Level:
             factory=enemy_factory,
             last_delta=0, health_callback=self.hud.update_health)
             for spawn, path in zip(map.spawns, paths)]
+
+        self.projectiles = utils.image.load_tile_map('shoot.png', (17, 17))
 
     def start(self, screen):
         """
@@ -470,7 +471,8 @@ class Level:
                             enemy_pos = self._grid_to_pixel_coord(enemy.position.x, enemy.position.y, self.scale)
                             pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
                             # create Projectile
-                            bullet = Projectile(pos, enemy_pos, self.scale)
+                            img = self.projectiles[settings.MAP_TYPE_TO_INDEX_PROJECTILES[pokemon.type]][0]
+                            bullet = Projectile(pos, enemy_pos, self.scale, img)
                             self.bullets.append(bullet)
                             # calculate coins
                             if enemy.life <= 0:
@@ -488,9 +490,8 @@ class Level:
         for pokemon in self.map.towers.values():
             if pokemon.is_active():
                 self.render_attack(pokemon)
-            if pokemon.can_attack(): #deactivate towers only if they are out of range. dont deactivate in waiting because of rate.
+            if pokemon.can_attack():  # deactivate towers only if they are out of range. dont deactivate in waiting because of rate.
                 pokemon.deactivate()
-
 
         for spawner in self.spawners:
             spawner.render(scale, offset)
@@ -501,35 +502,35 @@ class Level:
         self.hud.update_coins(self.wallet.coins)
         self.hud.render(1)
         self.ui.render()
-        
+
         # render score
         font = pygame.font.SysFont("Arial", 35, bold=True)
         font2 = pygame.font.SysFont("Arial", 20, bold=False)
         score = str(self.stage)
         score_t = font.render('Wave: ' + score, True, pygame.Color("Black"))
-        remaining_enemies = len(spawner.on_the_way)
+        remaining_enemies = sum(len(spawner.on_the_way) for spawner in self.spawners)
         remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
-        pygame.display.get_surface().blit(score_t, (self.game_screen.get_width() - 240 , 160))
+        pygame.display.get_surface().blit(score_t, (self.game_screen.get_width() - 240, 160))
         if remaining_enemies == 0:
-            remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color(79, 77, 78))
+            remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True,
+                                               pygame.Color(79, 77, 78))
         else:
             remaining_enemies_t = font2.render('Enemies left: ' + str(remaining_enemies), True, pygame.Color("Black"))
         pygame.display.get_surface().blit(remaining_enemies_t, (self.game_screen.get_width() - 240, 190))
 
     def render_bullets(self):
-        for bullet in iter(self.bullets):
+        for bullet in list(self.bullets):
             if len(bullet.path) == 0:
                 self.bullets.remove(bullet)
             else:
-                bullet.render_projectile(self.game_screen, self.map.sprites['shoot.png'], self.map.offset, self.map.scale)
+                bullet.render_projectile(self.game_screen, bullet.img, self.map.offset,
+                                         self.map.scale)
                 bullet.move()
-
 
     def render_attack(self, pokemon: PokemonTower):
         pixel_pos = self._grid_to_pixel_coord(pokemon.x, pokemon.y, self.scale)
         pos_x = pixel_pos[0] - 2 - self.map.offset[0] * settings.TILE_SIZE * self.scale
         pos_y = pixel_pos[1] - 2 - self.map.offset[1] * settings.TILE_SIZE * self.scale
         side = self.scale * settings.TILE_SIZE + 4
-        rect = pygame.Rect(pos_x, pos_y, side+4, side+4)
+        rect = pygame.Rect(pos_x, pos_y, side + 4, side + 4)
         pygame.draw.rect(self.map.game_screen, pygame.Color(255, 0, 0), rect, width=2)
-

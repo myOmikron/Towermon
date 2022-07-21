@@ -8,7 +8,6 @@ from pygame.surface import Surface, SurfaceType
 
 import settings
 from entities.navigation.Math.vector2 import Vector2
-from utils.image import load_png
 from utils.transform import rot_center
 
 

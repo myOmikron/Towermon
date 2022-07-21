@@ -1,5 +1,6 @@
 import pygame
 from pygame.surface import SurfaceType
+
 from utils import image
 
 

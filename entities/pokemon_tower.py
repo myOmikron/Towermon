@@ -1,13 +1,12 @@
 import time
+from typing import Tuple
 
 import pygame.mixer
+from pygame import Surface
 
 import settings
-import utils.image
-from json_utils import json_parser as parser
 from entities import entity
-from pygame import Surface
-from typing import Tuple
+from json_utils import json_parser as parser
 
 
 class PokemonTower:
@@ -40,7 +39,7 @@ class PokemonTower:
         if abs(current_time - self.last_attack) > (1 / self.rate) * 1000000000:
             self.last_attack = time.time_ns()
             return True
-        #self.deactivate()
+        # self.deactivate()
         return False
 
     # Greift einen Feind an, und zieht im Lebenspunkte ab
@@ -51,12 +50,14 @@ class PokemonTower:
         damage = self.level * factor
         enemy.take_life(damage)
         self.attack_sound.play()
+
     '''
     def in_range(self, enemy: entity.Enemy):
         enemy_x = enemy.position.x
         enemy_y = enemy.position.y
         return abs(self.y - enemy_y) <= self.range and abs(self.x - enemy_x) <= self.range
     '''
+
     def is_active(self):
         return self.active
 
@@ -64,11 +65,12 @@ class PokemonTower:
         self.active = False
 
 
-class Projectile():
-    def __init__(self, pos, enemy_pos, scale):
+class Projectile:
+    def __init__(self, pos, enemy_pos, scale, img):
         self.scale = scale
         self.pos = pos
         self.goal = enemy_pos
+        self.img = img
         self.path = self.calculate_points()
 
     def calculate_points(self):
@@ -99,7 +101,7 @@ class Projectile():
                 point[0] = point[0] / self.scale * scale
                 point[1] = point[1] / self.scale * scale
                 self.scale = scale
-        dx, dy = offset[0] * self.scale * settings.TILE_SIZE, offset[1] * self.scale *  settings.TILE_SIZE
-        tile_middle = (self.scale * settings.TILE_SIZE)/2 -8
+        dx, dy = offset[0] * self.scale * settings.TILE_SIZE, offset[1] * self.scale * settings.TILE_SIZE
+        tile_middle = (self.scale * settings.TILE_SIZE) / 2 - 8
         pos = self.pos[0] - dx + tile_middle, self.pos[1] - dy + tile_middle
         game_screen.blit(sprite, pos)

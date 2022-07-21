@@ -1,8 +1,8 @@
-from entities.navigation.NavMesh import NavMesh, Cell
-from entities.navigation.AStar import AStar
-
-from hypothesis import given, strategies as st
 import random
+
+from entities.navigation.AStar import AStar
+from entities.navigation.NavMesh import NavMesh, Cell
+from hypothesis import given, strategies as st
 
 
 def get_random_point(size: int):
@@ -40,6 +40,6 @@ def test_rais_condition(size: int):
     except IndexError:
         print(f"caught index Error index: {-1, -1} dimension: {size, size}")
     try:
-        mesh.get_cell((size+1, size+1))
+        mesh.get_cell((size + 1, size + 1))
     except IndexError:
-        print(f"caught index Error index: {size+1, size+1} dimension: {size, size}")
+        print(f"caught index Error index: {size + 1, size + 1} dimension: {size, size}")

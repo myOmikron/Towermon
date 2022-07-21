@@ -1,9 +1,9 @@
 import time
 from os.path import exists
 
-from pygame.mixer import Sound
 import pygame
-from entities.level import Level
+from pygame.mixer import Sound
+
 from menu import *
 from utils import image
 
@@ -25,9 +25,7 @@ class Game:
         self.playing = False
         self.paused = False
         self.playlist = []
-
-
-
+        self.level = Level.load_level("level_0.dat")
 
         # Fill screen black
         self.screen.fill((0, 0, 0))
@@ -61,7 +59,6 @@ class Game:
         counter = 0
 
         trigger_rerender = False
-        min_fps, max_fps = 500, 0
 
         while self.a < 1:
             self.level = Level.load_level("level_0.dat")
@@ -148,7 +145,7 @@ class Game:
                         if new_x > self.level.map.width - 2 - self.screen.get_width() // (
                                 self.scale * settings.TILE_SIZE):
                             new_x = self.level.map.width - 2 - self.screen.get_width() // (
-                                        self.scale * settings.TILE_SIZE)
+                                    self.scale * settings.TILE_SIZE)
                         if new_x < 0:
                             new_x = 0
                         offset = int(new_x), offset[1]
@@ -172,7 +169,7 @@ class Game:
                     if new_y > self.level.map.height - 1 - self.screen.get_height() // (
                             self.scale * settings.TILE_SIZE):
                         new_y = self.level.map.height - 1 - self.screen.get_height() // (
-                                    self.scale * settings.TILE_SIZE)
+                                self.scale * settings.TILE_SIZE)
                     if new_y < 0:
                         new_y = 0
                     offset = offset[0], int(new_y)
@@ -199,16 +196,12 @@ class Game:
             # self.player.render(time_delta, self.scale)
 
             fps = int(self.clock.get_fps())
-            min_fps = min(min_fps, fps)
-            max_fps = max(max_fps, fps)
             fps_t = self.font.render(str(fps), True, pygame.Color("RED"))
             pygame.display.get_surface().blit(fps_t, (0, 0))
 
-            pygame.display.update()
+            pygame.display.flip()
 
             trigger_rerender = False
-
-        print(f"max fps: {max_fps}, min fps: {min_fps}")
 
 
 class App:
@@ -230,7 +223,6 @@ class App:
     LEFT_KEY: bool = False
     START_KEY: bool = False
     BACK_KEY: bool = False
-
 
     def __init__(self):
         # Initialize the audio mixer
@@ -291,9 +283,10 @@ class App:
                     self.click_sound.play()
                 if event.key == pygame.K_a:
                     print(self.main_menu.current_text)
-                    if self.main_menu.current_text >= len(self.main_menu.intro_text)-2:
+                    if self.main_menu.current_text >= len(self.main_menu.intro_text) - 2:
                         self.main_menu.current_text = 0
-                    else: self.main_menu.current_text+= 2
+                    else:
+                        self.main_menu.current_text += 2
                     self.click_sound.play()
                     self.main_menu.draw_textbox()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -301,7 +294,6 @@ class App:
                 if x > 70 and x < 470 and y > 100 and y < 500:
                     poke_sound = pygame.mixer.Sound('assets/audio/CHARIZARD.ogg')
                     pygame.mixer.Sound.play(poke_sound)
-
 
     # help function for menu inputs
     def reset_keys(self):

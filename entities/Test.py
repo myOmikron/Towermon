@@ -3,15 +3,14 @@ from typing import Tuple
 import pygame
 from numpy.typing import NDArray
 
-import utils.image
-from entities.navigation.Math.vector2 import Vector2
-
 import settings
+import utils.image
 from entities.entity_factories import EnemyFactory
-from entities.spawners import EnemySpawner
+from entities.navigation.Math.vector2 import Vector2
 from entities.navigation.a_star import AStar
-from entities.navigation.nav_mesh import Cell, NavMesh
-from entities.tile import Tile, TileType
+from entities.navigation.nav_mesh import NavMesh
+from entities.spawners import EnemySpawner
+from entities.tile import Tile
 
 
 class Test:

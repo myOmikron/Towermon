@@ -1,6 +1,6 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import List, Callable, Tuple
-from copy import deepcopy
 
 from entities.entity import Entity, Enemy
 from entities.entity_factories import EntityFactory, EnemyFactory

@@ -6,7 +6,6 @@ from pygame.surface import Surface
 
 from entities.entity import Entity, Enemy
 from entities.navigation.Math.vector2 import Vector2
-from utils import image
 
 
 class EntityFactory(ABC):
