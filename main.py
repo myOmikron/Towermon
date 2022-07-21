@@ -289,7 +289,7 @@ class App:
                 if event.key == pygame.K_LEFT:
                     self.LEFT_KEY = True
                     self.click_sound.play()
-               if event.key == pygame.K_a:
+                if event.key == pygame.K_a:
                     print(self.main_menu.current_text)
                     if self.main_menu.current_text >= len(self.main_menu.intro_text)-2:
                         self.main_menu.current_text = 0
