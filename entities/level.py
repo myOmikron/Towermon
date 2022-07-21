@@ -197,7 +197,7 @@ class Level:
     wallet: Wallet
     wave_done: bool
     spawn_frequenz: float = 1
-    stage: int = 100
+    stage: int = 0
     health_bar: HealthBar
     game_over: bool
     ui: ButtonGrid
