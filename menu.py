@@ -35,7 +35,7 @@ class Menu:
         self.current_text = 0
         self.intro_text = ['Hello there! Welcome to the world of Pokémon!','Press (a) to continue.',
                       'Use the arrow keys to navigate through the menu,','press Enter to select an option or to start the game',
-                      'Before starting a new game, select a mode!','It sets the difficulty.', 'To go back to the main menu, press Backspace.', 'To quit, press the Esc key.',
+                      'Before starting a new game, select a mode!','It sets the difficulty.', 'To go back to the main menu, press Backspace.', 'To quit, press Exit Game.',
                       'A description of the game controls can be found in the', ' "Options" menu.','Try clicking on Charizard  ;-)', ' Have fun!']
         frame = image.load_png('speech_frame.png')
         self.frame = pg.transform.scale(frame, (800, 200))
@@ -314,7 +314,7 @@ class ControlsMenu(Menu):
             self.draw_text(self.font, 'LEFT MOUSECLICK  to place towers', self.mid_w, self.mid_h + 10)
             self.draw_text(self.font, 'W, A, S, D  to move through the map', self.mid_w, self.mid_h + 40)
             self.draw_text(self.font, 'MOUSEWHEEL  to zoom in and out', self.mid_w, self.mid_h + 70)
-            self.draw_text(self.font, 'ESC  to leave the game', self.mid_w, self.mid_h + 100)
+            self.draw_text(self.font, 'ESC  to pause the game', self.mid_w, self.mid_h + 100)
             self.draw_text(self.font, 'PRESS BACKSPACE TO GO BACK', self.mid_w, self.mid_h - 400)
             # self.draw_cursor()
             self.blit_()
