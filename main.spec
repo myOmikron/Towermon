@@ -4,7 +4,7 @@
 block_cipher = None
 
 datas = [('assets/audio/', 'assets/audio'), ('assets/Font/', 'assets/Font'), ('assets/graphics/*.png', 'assets/graphics'), ('assets/graphics/trainer/', 'assets/graphics/trainer'),
-    ('data/', 'data'), ('level_0.dat', '.')]
+    ('data/', 'data'), ('level_0.dat', '.'), ('README.md', '.'), ('PÒKEMON_LICENSE', '.')]
 
 
 a = Analysis(
