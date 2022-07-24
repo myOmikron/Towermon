@@ -40,11 +40,12 @@
  - `mmp-032/assets/graphics/speech_frame.png` - https://reliccastle.com/essentials/
  - `mmp-032/assets/graphics/squirtle.png` - https://reliccastle.com/essentials/
  - `mmp-032/assets/graphics/stone_tile.png` - https://reliccastle.com/essentials/
- -  mmp-032/assets/Font/Gameplay.tff - https://www.dafont.com/de/gameplay.font
- -  mmp-032/assets/Font/power green.ttf - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/CHARIZARD.ogg - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/Ingido Plateau.wav - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/Route 1.wav - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/Route 2.wav - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/Route 3.wav - https://reliccastle.com/essentials/
- -  mmp-032/assets/audio/Voltorb Flip win.ogg - https://reliccastle.com/essentials/
+ - `mmp-032/assets/Font/Gameplay.tff` - https://www.dafont.com/de/gameplay.font
+ - `mmp-032/assets/Font/power green.ttf` - https://reliccastle.com/essentials/
+ - `mmp-032/assets/audio/CHARIZARD.ogg` - https://reliccastle.com/essentials/
+ - `mmp-032/assets/audio/Ingido Plateau.wav` - https://reliccastle.com/essentials/ (zu .wav konvertiert)
+ - `mmp-032/assets/audio/Route 1.wav` - https://reliccastle.com/essentials/ (zu .wav kovertiert)
+ - `mmp-032/assets/audio/Route 2.wav` - https://reliccastle.com/essentials/ (zu .wav kovertiert)
+ - `mmp-032/assets/audio/Route 3.wav` - https://reliccastle.com/essentials/ (zu .wav kovertiert)
+ - `mmp-032/assets/audio/Voltorb Flip win.ogg` - https://reliccastle.com/essentials/
+ - `mmp-032/assets/audio/click.wav` - https://soundbible.com/1280-Click-On.html (kürzer geschnitten)
